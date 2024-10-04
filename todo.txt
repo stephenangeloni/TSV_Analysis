@@ -1,0 +1,32 @@
+1. Create a web page for analyzing TSV (Tab-Separated Values) files.
+2. The page should have the following elements:
+   - A file input for uploading TSV files
+   - A "Clear" button to reset the page
+   - A results display area
+   - dropdown menus for filtering on the columns but only up to 10000 values
+   - A filtered results display area
+ 
+3. Implement the following functionality:
+   - File parsing: Read and parse the uploaded TSV file
+   - Column analysis: Count distinct values in each column and use that to determine if a dropdown is ok or if it should be an input box
+   - Filtering: Allow users to filter data based on selected dropdown values or for the input box, the elements that contain that value. Make that comparison case insensitive.
+   - Clear functionality: Reset all filters
+ 
+4. Optimize for performance:
+   - Use efficient data structures (e.g., Set for counting distinct values)
+   - Minimize DOM updates by using javascript variables to hold the data until that data is ready to be put into a dom element in one go for bulk updates
+   - Use event delegation where appropriate
+   - Implement lazy loading for dropdown options
+ 
+5. Include timing measurements for performance analysis in the console log
+ 
+6. Style the page for readability:
+   - Use a clean, simple layout
+   - Set a maximum width for better readability on large screens
+   - Use appropriate spacing between elements
+ 
+7. Ensure the page is responsive and works on different screen sizes
+ 
+8. Use vanilla JavaScript without any external libraries or frameworks
+ 
+9. Include appropriate error handling and user feedback

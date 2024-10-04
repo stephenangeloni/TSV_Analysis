@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced TSV File Analyzer</title>
+    <style>
+        :root {
+            --ubs-red: #EC0016;
+            --ubs-dark-gray: #2C2C2C;
+            --ubs-light-gray: #F5F5F5;
+            --ubs-white: #FFFFFF;
+            --background-color: var(--ubs-white);
+            --text-color: var(--ubs-dark-gray);
+            --header-background: var(--ubs-white);
+            --content-background: var(--ubs-light-gray);
+            --table-even-row: var(--ubs-light-gray);
+            --modal-background: rgba(0, 0, 0, 0.7);
+            --code-background: #f4f4f4;
+            --code-text: #333;
+            --toggle-background: #ccc;
+            --toggle-button: #fff;
+        }
+
+        body.dark-mode {
+            --background-color: #121212;
+            --text-color: #E0E0E0;
+            --header-background: #1E1E1E;
+            --content-background: #2C2C2C;
+            --table-even-row: #3A3A3A;
+            --modal-background: rgba(255, 255, 255, 0.1);
+            --code-background: #2d2d2d;
+            --code-text: #e0e0e0;
+            --toggle-background: #444444;
+            /* Changed to dark grey */
+            --toggle-button: #fff;
+        }
+
+        body,
+        html {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            font-family: Helvetica, Arial, sans-serif;
+            line-height: 1.4;
+            background-color: var(--background-color);
+            color: var(--text-color);
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .header {
+            background-color: var(--header-background);
+            color: var(--text-color);
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 3px solid var(--ubs-red);
+        }
+
+        .logo {
+            font-size: 32px;
+            font-weight: bold;
+        }
+
+        .content {
+            flex: 1;
+            padding: 20px;
+            background-color: var(--content-background);
+            width: calc(100% - 40px);
+            box-sizing: border-box;
+            margin: 0 auto;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        .file-input-label {
+            background-color: var(--header-background);
+            color: var(--text-color);
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+            border: 1px solid var(--text-color);
+        }
+
+        .file-input-label:hover {
+            background-color: var(--content-background);
+        }
+
+        #filteredRowsCount {
+            margin-bottom: 20px;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .filter-container {
+            margin-bottom: 20px;
+        }
+
+        #sqlQuery {
+            width: 100%;
+            height: 60px;
+            margin-bottom: 10px;
+            border: 1px solid var(--text-color);
+            padding: 10px;
+            font-family: monospace;
+            box-sizing: border-box;
+            background-color: var(--background-color);
+            color: var(--text-color);
+        }
+
+        #runQuery {
+            background-color: var(--ubs-red);
+            color: var(--ubs-white);
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+        #runQuery:hover {
+            background-color: #D10014;
+        }
+
+        #filteredResultsArea {
+            background-color: var(--background-color);
+            border: 1px solid var(--text-color);
+            padding: 20px;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            font-size: 14px;
+            line-height: 1.2;
+            border-spacing: 0;
+        }
+
+        th,
+        td {
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: var(--ubs-red);
+            color: var(--ubs-white);
+            position: sticky;
+            top: 0;
+            font-size: 15px;
+            border-bottom: 2px solid var(--ubs-white);
+        }
+
+        tr:nth-child(even) {
+            background-color: var(--table-even-row);
+        }
+
+        tr {
+            cursor: pointer;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: var(--modal-background);
+        }
+
+        .modal-content {
+            background-color: var(--background-color);
+            margin: 0;
+            padding: 20px;
+            border: 1px solid var(--text-color);
+            width: 85%;
+            height: 85%;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .close {
+            color: var(--text-color);
+            align-self: flex-end;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: var(--ubs-red);
+            text-decoration: none;
+        }
+
+        #modalHeader {
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        #modalContent {
+            flex-grow: 1;
+            overflow-y: auto;
+            background-color: var(--code-background);
+            color: var(--code-text);
+            padding: 10px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .clicked-row {
+            font-weight: bold;
+            font-style: italic;
+        }
+
+        /* Updated styles for the dark mode toggle switch */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--toggle-background);
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: var(--toggle-button);
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked+.slider {
+            background-color: var(--toggle-background);
+        }
+
+        input:checked+.slider:before {
+            transform: translateX(26px);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <label for="fileInput" class="file-input-label">Choose File</label>
+            <input type="file" id="fileInput" accept=".tsv,.txt">
+            <div class="logo">Analyzer</div>
+            <label class="switch">
+                <input type="checkbox" id="darkModeToggle">
+                <span class="slider"></span>
+            </label>
+        </div>
+        <div class="content">
+            <div id="filteredRowsCount"></div>
+            <div class="filter-container">
+                <textarea id="sqlQuery"
+                    placeholder="Enter your SQL query here...">SELECT * FROM data LIMIT 1000</textarea>
+                <button id="runQuery">Run Query</button>
+            </div>
+            <div id="filteredResultsArea"></div>
+        </div>
+    </div>
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div id="modalHeader"></div>
+            <div id="modalContent"></div>
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js"></script>
+    <script>
+        // Global variables
+        let db;
+        let headers = [];
+
+        // Performance measurement
+        const perfMeasure = (name, fn) => {
+            const start = performance.now();
+            fn();
+            const end = performance.now();
+            console.log(`${name} took ${end - start} milliseconds.`);
+        };
+
+        // Initialize SQL.js
+        initSqlJs({ locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${file}` }).then(SQL => {
+            db = new SQL.Database();
+            console.log("SQL.js initialized");
+        });
+
+        // File parsing
+        document.getElementById('fileInput').addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            const reader = new FileReader();
+
+            reader.onload = (e) => {
+                perfMeasure('File Parsing and DB Creation', () => {
+                    const content = e.target.result;
+                    const lines = content.split('\n');
+                    headers = lines[0].split('\t');
+
+                    // Create table
+                    const createTableSQL = `CREATE TABLE data (${headers.map(h => `"${h}" TEXT`).join(', ')})`;
+                    db.run(createTableSQL);
+
+                    // Insert data
+                    const stmt = db.prepare(`INSERT INTO data VALUES (${headers.map(() => '?').join(', ')})`);
+                    db.run('BEGIN TRANSACTION');
+                    lines.slice(1).forEach(line => {
+                        if (line.trim() !== '') {
+                            stmt.run(line.split('\t'));
+                        }
+                    });
+                    db.run('COMMIT');
+                    stmt.free();
+                });
+
+                // Display initial results
+                runQuery();
+            };
+
+            reader.readAsText(file);
+        });
+
+        // Run SQL query
+        function runQuery() {
+            const query = document.getElementById('sqlQuery').value;
+            perfMeasure('Run Query', () => {
+                try {
+                    const results = db.exec(query);
+                    displayResults(results);
+                } catch (error) {
+                    console.error('SQL Error:', error);
+                    document.getElementById('filteredResultsArea').innerHTML = `<p>Error: ${error.message}</p>`;
+                }
+            });
+        }
+
+        // Display query results
+        function displayResults(results) {
+            const filteredResultsArea = document.getElementById('filteredResultsArea');
+
+            if (results.length === 0 || results[0].values.length === 0) {
+                filteredResultsArea.innerHTML = '<p>No results found.</p>';
+                return;
+            }
+
+            let tableHTML = '<table>';
+
+            // Create header
+            tableHTML += '<tr>';
+            results[0].columns.forEach(column => {
+                tableHTML += `<th>${escapeHTML(column)}</th>`;
+            });
+            tableHTML += '</tr>';
+
+            // Create data rows (limit to 50,000 rows)
+            const rowsToDisplay = Math.min(results[0].values.length, 50000);
+            for (let i = 0; i < rowsToDisplay; i++) {
+                const row = results[0].values[i];
+                tableHTML += '<tr>';
+                row.forEach(cell => {
+                    tableHTML += `<td>${escapeHTML(cell)}</td>`;
+                });
+                tableHTML += '</tr>';
+            }
+
+            tableHTML += '</table>';
+
+            // Set the innerHTML once
+            filteredResultsArea.innerHTML = tableHTML;
+
+            // Update filtered rows count
+            const totalRows = results[0].values.length;
+            const displayedRows = rowsToDisplay;
+            document.getElementById('filteredRowsCount').textContent =
+                `Displaying ${displayedRows} of ${totalRows} filtered rows`;
+
+            // Add click event listeners to table rows
+            const table = filteredResultsArea.querySelector('table');
+            table.addEventListener('click', handleRowClick);
+        }
+
+        // Handle row click
+        function handleRowClick(event) {
+            const row = event.target.closest('tr');
+            if (!row) return;
+
+            const cells = row.cells;
+            if (cells.length < 3) return;
+
+            const firstThreeColumns = Array.from(cells).slice(0, 3).map(cell => cell.textContent);
+            const lastColumn = headers[headers.length - 1];
+
+            const query = `
+                SELECT "${lastColumn}"
+                FROM data
+                WHERE "${headers[0]}" = ? AND "${headers[1]}" = ? AND "${headers[2]}" = ?
+            `;
+
+            try {
+                const results = db.exec(query, firstThreeColumns);
+                displayModal(results, firstThreeColumns, cells[cells.length - 1].textContent);
+            } catch (error) {
+                console.error('SQL Error:', error);
+            }
+        }
+
+        // Display modal with matching data
+        function displayModal(results, firstThreeColumns, clickedValue) {
+            const modalHeader = document.getElementById('modalHeader');
+            const modalContent = document.getElementById('modalContent');
+            const modal = document.getElementById('myModal');
+
+            modalHeader.textContent = firstThreeColumns.join(' | ');
+
+            if (results.length === 0 || results[0].values.length === 0) {
+                modalContent.textContent = 'No matching data found.';
+            } else {
+                let contentText = '';
+                results[0].values.forEach((row, index) => {
+                    if (row[0] === clickedValue) {
+                        contentText += `<span class="clicked-row">${escapeHTML(row[0])}</span>\n`;
+                    } else {
+                        contentText += `${escapeHTML(row[0])}\n`;
+                    }
+                });
+                modalContent.innerHTML = contentText;
+            }
+
+            modal.style.display = 'block';
+        }
+
+        // Helper function to escape HTML special characters
+        function escapeHTML(unsafe) {
+            return unsafe
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        // Add event listener for the Run Query button
+        document.getElementById('runQuery').addEventListener('click', runQuery);
+
+        // Dark mode toggle
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        darkModeToggle.addEventListener('change', () => {
+            document.body.classList.toggle('dark-mode');
+        });
+
+        // Modal close functionality
+        const modal = document.getElementById('myModal');
+        const span = document.getElementsByClassName('close')[0];
+
+        span.onclick = function () {
+            modal.style.display = 'none';
+        }
+
+        window.onclick = function (event) {
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+
+</html>
