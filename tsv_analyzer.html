@@ -33,7 +33,6 @@
             --code-background: #2d2d2d;
             --code-text: #e0e0e0;
             --toggle-background: #444444;
-            /* Changed to dark grey */
             --toggle-button: #fff;
         }
 
@@ -235,7 +234,6 @@
             font-style: italic;
         }
 
-        /* Updated styles for the dark mode toggle switch */
         .switch {
             position: relative;
             display: inline-block;
@@ -331,6 +329,16 @@
             console.log("SQL.js initialized");
         });
 
+        // Check if a row is valid (all columns except the last one are not empty)
+        function isValidRow(row) {
+            for (let i = 0; i < row.length - 1; i++) {
+                if (row[i].trim() === '') {
+                    return false;
+                }
+            }
+            return true;
+        }
+
         // File parsing
         document.getElementById('fileInput').addEventListener('change', (event) => {
             const file = event.target.files[0];
@@ -349,13 +357,19 @@
                     // Insert data
                     const stmt = db.prepare(`INSERT INTO data VALUES (${headers.map(() => '?').join(', ')})`);
                     db.run('BEGIN TRANSACTION');
+                    let validRowCount = 0;
                     lines.slice(1).forEach(line => {
                         if (line.trim() !== '') {
-                            stmt.run(line.split('\t'));
+                            const row = line.split('\t');
+                            if (isValidRow(row)) {
+                                stmt.run(row);
+                                validRowCount++;
+                            }
                         }
                     });
                     db.run('COMMIT');
                     stmt.free();
+                    console.log(`Inserted ${validRowCount} valid rows into the database.`);
                 });
 
                 // Display initial results
