@@ -69,13 +69,12 @@
         }
 
         .content {
-            flex: 1;
+            flex: 1; // Allow content to grow and fill available space
             padding: 20px;
             background-color: var(--content-background);
             width: calc(100% - 40px);
             box-sizing: border-box;
             margin: 0 auto;
-            height: calc(100vh - 60px); // Adjusted height to account for header
         }
 
         #fileInput {
@@ -140,11 +139,12 @@
             border: 1px solid var(--text-color);
             padding: 20px;
             overflow-x: auto;
+            flex: 1; // Allow filtered results area to grow and fill available space
         }
 
         .table-container {
             overflow-x: auto;
-            max-height: 600px;
+            flex: 1; // Allow the table container to grow and fill available space
         }
 
         table {
