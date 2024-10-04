@@ -141,17 +141,24 @@
             overflow-x: auto;
         }
 
+        .table-container {
+            overflow-x: auto;
+            max-height: 600px;
+        }
+
         table {
             width: 100%;
             font-size: 14px;
             line-height: 1.2;
             border-spacing: 0;
+            border-collapse: separate;
         }
 
         th,
         td {
             padding: 8px;
             text-align: left;
+            border-bottom: 1px solid var(--text-color);
         }
 
         th {
@@ -160,7 +167,7 @@
             position: sticky;
             top: 0;
             font-size: 15px;
-            border-bottom: 2px solid var(--ubs-white);
+            z-index: 10;
         }
 
         tr:nth-child(even) {
@@ -314,6 +321,7 @@
         // Global variables
         let db;
         let headers = [];
+        let sanitizedHeaders = [];
 
         // Check if logging is enabled
         const isLoggingEnabled = new URLSearchParams(window.location.search).get('log') === '1';
@@ -351,6 +359,11 @@
             log('SQL.js initialized');
         });
 
+        // Sanitize header for SQLite column name
+        function sanitizeHeader(header) {
+            return header.trim().replace(/[^a-zA-Z0-9_]/g, '_');
+        }
+
         // Check if a row is valid (all columns except the last one are not empty)
         function isValidRow(row) {
             for (let i = 0; i < row.length - 1; i++) {
@@ -373,16 +386,23 @@
                     const lines = content.split('\n');
                     log(`Total lines in file: ${lines.length}`);
 
-                    headers = lines[0].split('\t');
-                    log(`Headers: ${headers.join(', ')}`);
+                    headers = lines[0].split('\t').map(h => h.trim());
+                    sanitizedHeaders = headers.map(sanitizeHeader);
+                    log(`Original Headers: ${headers.join(', ')}`);
+                    log(`Sanitized Headers: ${sanitizedHeaders.join(', ')}`);
 
                     // Create table
-                    const createTableSQL = `CREATE TABLE data (${headers.map(h => `"${h}" TEXT`).join(', ')})`;
+                    const createTableSQL = `CREATE TABLE data (${sanitizedHeaders.map(h => `"${h}" TEXT`).join(', ')})`;
                     log(`Creating table with SQL: ${createTableSQL}`);
                     db.run(createTableSQL);
 
+                    // Log database structure if logging is enabled
+                    if (isLoggingEnabled) {
+                        log('Database structure:', db.exec("SELECT sql FROM sqlite_master WHERE type='table'").map(row => row.values[0]).join('\n'));
+                    }
+
                     // Insert data
-                    const stmt = db.prepare(`INSERT INTO data VALUES (${headers.map(() => '?').join(', ')})`);
+                    const stmt = db.prepare(`INSERT INTO data VALUES (${sanitizedHeaders.map(() => '?').join(', ')})`);
                     log('Prepared statement for data insertion');
                     db.run('BEGIN TRANSACTION');
                     let validRowCount = 0;
@@ -423,13 +443,27 @@
                 try {
                     log(`Executing query: ${query}`);
                     const stmt = db.prepare(query);
+                    log(`Statement prepared: ${stmt}`); // Log the statement object
+                    
+                    // Get column names immediately after preparing the statement
+                    const columnNames = stmt.getColumnNames();
+                    log(`Column Names: ${columnNames.join(', ')}`); // Log column names
+
                     const results = [];
                     while (stmt.step()) {
                         results.push(stmt.get());
                     }
                     stmt.free();
                     log(`Query executed successfully. Result count: ${results.length}`);
-                    displayResults([{ columns: stmt.getColumnNames(), values: results }]);
+
+                    // Check if column names are empty
+                    if (columnNames.length === 0) {
+                        log('No column names returned. Check the table structure.');
+                        const schema = db.exec("SELECT sql FROM sqlite_master WHERE type='table'").map(row => row.values[0]).join('\n');
+                        log(`Table Schema: ${schema}`);
+                    }
+
+                    displayResults([{ columns: columnNames, values: results }]);
                 } catch (error) {
                     logError('SQL Error:', error);
                     document.getElementById('filteredResultsArea').innerHTML = `<p>Error: ${error.message}</p>`;
@@ -452,16 +486,19 @@
                 return;
             }
 
-            let tableHTML = '<table>';
+            let tableHTML = '<div class="table-container"><table>';
 
             // Create header
-            tableHTML += '<tr>';
+            tableHTML += '<thead><tr>';
             results[0].columns.forEach(column => {
-                tableHTML += `<th>${escapeHTML(column)}</th>`;
+                const originalHeader = headers[sanitizedHeaders.indexOf(column)] || column;
+                log(`Column: ${column}, Original Header: ${originalHeader}`); // Added logging
+                tableHTML += `<th>${escapeHTML(originalHeader)}</th>`;
             });
-            tableHTML += '</tr>';
+            tableHTML += '</tr></thead>';
 
             // Create data rows (limit to 50,000 rows)
+            tableHTML += '<tbody>';
             const rowsToDisplay = Math.min(results[0].values.length, 50000);
             for (let i = 0; i < rowsToDisplay; i++) {
                 const row = results[0].values[i];
@@ -471,8 +508,9 @@
                 });
                 tableHTML += '</tr>';
             }
+            tableHTML += '</tbody>';
 
-            tableHTML += '</table>';
+            tableHTML += '</table></div>';
 
             // Set the innerHTML once
             filteredResultsArea.innerHTML = tableHTML;
@@ -498,12 +536,12 @@
             if (cells.length < 3) return;
 
             const firstThreeColumns = Array.from(cells).slice(0, 3).map(cell => cell.textContent);
-            const lastColumn = headers[headers.length - 1];
+            const lastColumn = sanitizedHeaders[sanitizedHeaders.length - 1];
 
             const query = `
                 SELECT "${lastColumn}"
                 FROM data
-                WHERE "${headers[0]}" = ? AND "${headers[1]}" = ? AND "${headers[2]}" = ?
+                WHERE "${sanitizedHeaders[0]}" = ? AND "${sanitizedHeaders[1]}" = ? AND "${sanitizedHeaders[2]}" = ?
             `;
 
             try {
