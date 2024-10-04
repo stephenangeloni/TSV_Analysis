@@ -50,7 +50,7 @@
         .container {
             display: flex;
             flex-direction: column;
-            min-height: 100vh;
+            height: 100vh; // Set height to 100% of the viewport height
         }
 
         .header {
@@ -75,6 +75,7 @@
             width: calc(100% - 40px);
             box-sizing: border-box;
             margin: 0 auto;
+            height: calc(100vh - 60px); // Adjusted height to account for header
         }
 
         #fileInput {
@@ -181,7 +182,7 @@
         .modal {
             display: none;
             position: fixed;
-            z-index: 1;
+            z-index: 1000; // Increased z-index to ensure modal is above other elements
             left: 0;
             top: 0;
             width: 100%;
