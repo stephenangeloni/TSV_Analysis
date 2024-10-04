@@ -537,6 +537,7 @@
             if (cells.length < 3) return;
 
             const firstThreeColumns = Array.from(cells).slice(0, 3).map(cell => cell.textContent);
+            const modalHeaderColumns = Array.from(cells).slice(0, 4).map(cell => cell.textContent);
             const lastColumn = sanitizedHeaders[sanitizedHeaders.length - 1];
 
             const query = `
@@ -556,7 +557,7 @@
                 }
                 stmt.free();
                 log(`Row click query executed successfully. Result count: ${results.length}`);
-                displayModal([{ values: results }], firstThreeColumns, cells[cells.length - 1].textContent);
+                displayModal([{ values: results }], modalHeaderColumns, cells[cells.length - 1].textContent);
             } catch (error) {
                 logError('SQL Error:', error);
                 log('Error details:', error);
@@ -567,13 +568,13 @@
         }
 
         // Display modal with matching data
-        function displayModal(results, firstThreeColumns, clickedValue) {
-            log('Displaying modal for:', firstThreeColumns.join(' | '));
+        function displayModal(results, modalHeaderColumns, clickedValue) {
+            log('Displaying modal for:', modalHeaderColumns.join(' | '));
             const modalHeader = document.getElementById('modalHeader');
             const modalContent = document.getElementById('modalContent');
             const modal = document.getElementById('myModal');
 
-            modalHeader.textContent = firstThreeColumns.join(' | ');
+            modalHeader.textContent = modalHeaderColumns.join(' | ');
 
             if (results.length === 0 || results[0].values.length === 0) {
                 modalContent.textContent = 'No matching data found.';
