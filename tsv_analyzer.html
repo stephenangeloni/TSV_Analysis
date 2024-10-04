@@ -315,6 +315,23 @@
         let db;
         let headers = [];
 
+        // Check if logging is enabled
+        const isLoggingEnabled = new URLSearchParams(window.location.search).get('log') === '1';
+
+        // Logging function
+        function log(...args) {
+            if (isLoggingEnabled) {
+                console.log(`${getTimestamp()} -`, ...args);
+            }
+        }
+
+        // Error logging function
+        function logError(...args) {
+            if (isLoggingEnabled) {
+                console.error(`${getTimestamp()} -`, ...args);
+            }
+        }
+
         // Timestamp function for logging
         function getTimestamp() {
             return new Date().toISOString();
@@ -325,13 +342,13 @@
             const start = performance.now();
             fn();
             const end = performance.now();
-            console.log(`${getTimestamp()} - ${name} took ${end - start} milliseconds.`);
+            log(`${name} took ${end - start} milliseconds.`);
         };
 
         // Initialize SQL.js
         initSqlJs({ locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${file}` }).then(SQL => {
             db = new SQL.Database();
-            console.log(`${getTimestamp()} - SQL.js initialized`);
+            log('SQL.js initialized');
         });
 
         // Check if a row is valid (all columns except the last one are not empty)
@@ -351,45 +368,45 @@
 
             reader.onload = (e) => {
                 perfMeasure('File Parsing and DB Creation', () => {
-                    console.log(`${getTimestamp()} - Starting file parsing`);
+                    log('Starting file parsing');
                     const content = e.target.result;
                     const lines = content.split('\n');
-                    console.log(`${getTimestamp()} - Total lines in file: ${lines.length}`);
+                    log(`Total lines in file: ${lines.length}`);
 
                     headers = lines[0].split('\t');
-                    console.log(`${getTimestamp()} - Headers: ${headers.join(', ')}`);
+                    log(`Headers: ${headers.join(', ')}`);
 
                     // Create table
                     const createTableSQL = `CREATE TABLE data (${headers.map(h => `"${h}" TEXT`).join(', ')})`;
-                    console.log(`${getTimestamp()} - Creating table with SQL: ${createTableSQL}`);
+                    log(`Creating table with SQL: ${createTableSQL}`);
                     db.run(createTableSQL);
 
                     // Insert data
                     const stmt = db.prepare(`INSERT INTO data VALUES (${headers.map(() => '?').join(', ')})`);
-                    console.log(`${getTimestamp()} - Prepared statement for data insertion`);
+                    log('Prepared statement for data insertion');
                     db.run('BEGIN TRANSACTION');
                     let validRowCount = 0;
                     let invalidRowCount = 0;
                     lines.slice(1).forEach((line, index) => {
                         if (line.trim() !== '') {
                             const row = line.split('\t');
-                            console.log(`${getTimestamp()} - Processing row ${index + 1}: ${row.join(' | ')}`);
+                            log(`Processing row ${index + 1}: ${row.join(' | ')}`);
                             if (isValidRow(row)) {
                                 stmt.run(row);
                                 validRowCount++;
-                                console.log(`${getTimestamp()} - Row ${index + 1} is valid and inserted`);
+                                log(`Row ${index + 1} is valid and inserted`);
                             } else {
                                 invalidRowCount++;
-                                console.log(`${getTimestamp()} - Row ${index + 1} is invalid and skipped`);
+                                log(`Row ${index + 1} is invalid and skipped`);
                             }
                         } else {
-                            console.log(`${getTimestamp()} - Empty line at row ${index + 1}, skipped`);
+                            log(`Empty line at row ${index + 1}, skipped`);
                         }
                     });
                     db.run('COMMIT');
                     stmt.free();
-                    console.log(`${getTimestamp()} - Inserted ${validRowCount} valid rows into the database.`);
-                    console.log(`${getTimestamp()} - Skipped ${invalidRowCount} invalid rows.`);
+                    log(`Inserted ${validRowCount} valid rows into the database.`);
+                    log(`Skipped ${invalidRowCount} invalid rows.`);
                 });
 
                 // Display initial results
@@ -404,21 +421,21 @@
             const query = document.getElementById('sqlQuery').value;
             perfMeasure('Run Query', () => {
                 try {
-                    console.log(`${getTimestamp()} - Executing query: ${query}`);
+                    log(`Executing query: ${query}`);
                     const stmt = db.prepare(query);
                     const results = [];
                     while (stmt.step()) {
                         results.push(stmt.get());
                     }
                     stmt.free();
-                    console.log(`${getTimestamp()} - Query executed successfully. Result count: ${results.length}`);
+                    log(`Query executed successfully. Result count: ${results.length}`);
                     displayResults([{ columns: stmt.getColumnNames(), values: results }]);
                 } catch (error) {
-                    console.error(`${getTimestamp()} - SQL Error:`, error);
+                    logError('SQL Error:', error);
                     document.getElementById('filteredResultsArea').innerHTML = `<p>Error: ${error.message}</p>`;
-                    console.log(`${getTimestamp()} - Error details:`, error);
+                    log('Error details:', error);
                     if (error.stack) {
-                        console.log(`${getTimestamp()} - Error stack:`, error.stack);
+                        log('Error stack:', error.stack);
                     }
                 }
             });
@@ -426,12 +443,12 @@
 
         // Display query results
         function displayResults(results) {
-            console.log(`${getTimestamp()} - Displaying results`);
+            log('Displaying results');
             const filteredResultsArea = document.getElementById('filteredResultsArea');
 
             if (results.length === 0 || results[0].values.length === 0) {
                 filteredResultsArea.innerHTML = '<p>No results found.</p>';
-                console.log(`${getTimestamp()} - No results to display`);
+                log('No results to display');
                 return;
             }
 
@@ -465,7 +482,7 @@
             const displayedRows = rowsToDisplay;
             document.getElementById('filteredRowsCount').textContent =
                 `Displaying ${displayedRows} of ${totalRows} filtered rows`;
-            console.log(`${getTimestamp()} - Displayed ${displayedRows} of ${totalRows} filtered rows`);
+            log(`Displayed ${displayedRows} of ${totalRows} filtered rows`);
 
             // Add click event listeners to table rows
             const table = filteredResultsArea.querySelector('table');
@@ -490,8 +507,8 @@
             `;
 
             try {
-                console.log(`${getTimestamp()} - Executing row click query:`, query);
-                console.log(`${getTimestamp()} - Parameters:`, firstThreeColumns);
+                log('Executing row click query:', query);
+                log('Parameters:', firstThreeColumns);
                 const stmt = db.prepare(query);
                 stmt.bind(firstThreeColumns);
                 const results = [];
@@ -499,20 +516,20 @@
                     results.push(stmt.get());
                 }
                 stmt.free();
-                console.log(`${getTimestamp()} - Row click query executed successfully. Result count: ${results.length}`);
+                log(`Row click query executed successfully. Result count: ${results.length}`);
                 displayModal([{ values: results }], firstThreeColumns, cells[cells.length - 1].textContent);
             } catch (error) {
-                console.error(`${getTimestamp()} - SQL Error:`, error);
-                console.log(`${getTimestamp()} - Error details:`, error);
+                logError('SQL Error:', error);
+                log('Error details:', error);
                 if (error.stack) {
-                    console.log(`${getTimestamp()} - Error stack:`, error.stack);
+                    log('Error stack:', error.stack);
                 }
             }
         }
 
         // Display modal with matching data
         function displayModal(results, firstThreeColumns, clickedValue) {
-            console.log(`${getTimestamp()} - Displaying modal for:`, firstThreeColumns.join(' | '));
+            log('Displaying modal for:', firstThreeColumns.join(' | '));
             const modalHeader = document.getElementById('modalHeader');
             const modalContent = document.getElementById('modalContent');
             const modal = document.getElementById('myModal');
@@ -521,7 +538,7 @@
 
             if (results.length === 0 || results[0].values.length === 0) {
                 modalContent.textContent = 'No matching data found.';
-                console.log(`${getTimestamp()} - No matching data found for modal`);
+                log('No matching data found for modal');
             } else {
                 let contentText = '';
                 results[0].values.forEach((row, index) => {
@@ -532,7 +549,7 @@
                     }
                 });
                 modalContent.innerHTML = contentText;
-                console.log(`${getTimestamp()} - Modal content set with ${results[0].values.length} rows`);
+                log(`Modal content set with ${results[0].values.length} rows`);
             }
 
             modal.style.display = 'block';
@@ -555,7 +572,7 @@
         const darkModeToggle = document.getElementById('darkModeToggle');
         darkModeToggle.addEventListener('change', () => {
             document.body.classList.toggle('dark-mode');
-            console.log(`${getTimestamp()} - Dark mode toggled`);
+            log('Dark mode toggled');
         });
 
         // Modal close functionality
@@ -564,13 +581,13 @@
 
         span.onclick = function () {
             modal.style.display = 'none';
-            console.log(`${getTimestamp()} - Modal closed`);
+            log('Modal closed');
         }
 
         window.onclick = function (event) {
             if (event.target == modal) {
                 modal.style.display = 'none';
-                console.log(`${getTimestamp()} - Modal closed by clicking outside`);
+                log('Modal closed by clicking outside');
             }
         }
     </script>
