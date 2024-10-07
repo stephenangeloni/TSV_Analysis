@@ -59,16 +59,16 @@
             background-color: var(--header-background);
             color: var(--text-color);
             padding: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 2px solid var(--ubs-red);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+            display: flex; /* Use flexbox for the header */
+            align-items: center; /* Center items vertically */
+            justify-content: space-between; /* Space between items */
+            position: relative; /* Position relative for absolute centering */
         }
 
-        .logo {
-            font-size: 32px;
-            font-weight: bold;
+        .logo-container {
+            position: absolute; /* Position absolute to center the logo */
+            left: 50%; /* Move to the center */
+            transform: translateX(-50%); /* Adjust to center */
         }
 
         .content {
@@ -81,7 +81,7 @@
             overflow-y: auto; /* Enable vertical scrolling */
         }
 
-        #fileInputSREF {
+        #loadSREF {
             display: none;
         }
 
@@ -95,6 +95,8 @@
             transition: background-color 0.3s;
             border: 1px solid var(--text-color);
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+            margin-right: 2px; /* Set to a smaller value for closer spacing */
+            display: inline-block; /* Ensure labels are inline */
         }
 
         .file-input-label:hover {
@@ -320,15 +322,36 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+
+        .file-inputs {
+            display: flex; /* Use flexbox for the file inputs */
+            align-items: center; /* Center items vertically */
+            margin-right: auto; /* Push the logo and dark mode toggle to the right */
+        }
+
+        .logo {
+            font-size: 32px; /* Increase font size */
+            font-weight: bold; /* Make the text bold */
+            text-align: center; /* Center the text */
+        }
     </style>
 </head>
 
 <body>
     <div class="container">
         <div class="header">
-            <label for="fileInputSREF" class="file-input-label">Choose SREF</label>
-            <input type="file" id="fileInputSREF" accept=".tsv,.txt">
-            <div class="logo">Analyzer</div>
+            <div class="file-inputs">
+                <label for="loadSREF" class="file-input-label">Load SREF</label>
+                <input type="file" id="loadSREF" accept=".tsv,.txt">
+                
+                <label for="loadIssues" class="file-input-label">Load ISSUES</label>
+                <input type="file" id="loadIssues" accept=".tsv,.txt" style="display: none;"> <!-- Hidden input for issues -->
+            </div>
+            
+            <div class="logo-container">
+                <div class="logo">Analyzer</div>
+            </div>
+            
             <label class="switch">
                 <input type="checkbox" id="darkModeToggle">
                 <span class="slider"></span>
@@ -338,7 +361,11 @@
             <div id="filteredRowsCount"></div>
             <div class="filter-container">
                 <textarea id="sqlQuery"
-                    placeholder="Enter your SQL query here...">SELECT * FROM sref LIMIT 1000</textarea>
+                    placeholder=
+"select * from sref where (lib, mbr) 
+in (select lib, mbr from issues
+       where relobj='FDBCLI' or reltype like '%file%' or issue like '%someproblem%')">select * from sref where (lib, mbr) 
+in (select lib, mbr from issues</textarea>
                 <button id="runQuery">Run Query</button>
             </div>
             <div id="filteredResultsArea"></div>
@@ -421,7 +448,7 @@
         }
 
         // Modify file input event listener
-        document.getElementById('fileInputSREF').addEventListener('change', (event) => {
+        document.getElementById('loadSREF').addEventListener('change', (event) => {
             showSpinner(); // Show spinner when file is loading
             const file = event.target.files[0];
             const reader = new FileReader();
@@ -701,6 +728,65 @@
                 log('Modal closed by clicking outside');
             }
         }
+
+        // Add this new event listener for loading issues
+        document.getElementById('loadIssues').addEventListener('change', (event) => {
+            showSpinner(); // Show spinner when file is loading
+            const file = event.target.files[0];
+            const reader = new FileReader();
+
+            reader.onload = (e) => {
+                perfMeasure('Issues File Parsing and DB Creation', () => {
+                    log('Starting issues file parsing');
+                    const content = e.target.result;
+                    const lines = content.split('\n');
+                    log(`Total lines in issues file: ${lines.length}`);
+
+                    // Clear existing issues table before loading new data
+                    db.run("DROP TABLE IF EXISTS issues"); // Drop the existing table
+
+                    // Define headers for the issues table
+                    const issuesHeaders = ['LIB', 'MBR', 'ISSUE', 'RELOBJ', 'RELTYPE'];
+                    const sanitizedIssuesHeaders = issuesHeaders.map(sanitizeHeader);
+                    
+                    // Create issues table
+                    const createIssuesTableSQL = `CREATE TABLE issues (${sanitizedIssuesHeaders.map(h => `"${h}" TEXT`).join(', ')})`;
+                    log(`Creating issues table with SQL: ${createIssuesTableSQL}`);
+                    db.run(createIssuesTableSQL);
+
+                    // Insert data into issues table
+                    const stmt = db.prepare(`INSERT INTO issues VALUES (${sanitizedIssuesHeaders.map(() => '?').join(', ')})`);
+                    log('Prepared statement for issues data insertion');
+                    db.run('BEGIN TRANSACTION');
+                    let validRowCount = 0;
+                    let invalidRowCount = 0;
+                    lines.slice(1).forEach((line, index) => {
+                        if (line.trim() !== '') {
+                            const row = line.split('\t');
+                            log(`Processing issues row ${index + 1}: ${row.join(' | ')}`);
+                            if (row.length === 5) { // Ensure the row has exactly 5 columns
+                                stmt.run(row);
+                                validRowCount++;
+                                log(`Issues row ${index + 1} is valid and inserted`);
+                            } else {
+                                invalidRowCount++;
+                                log(`Issues row ${index + 1} is invalid and skipped`);
+                            }
+                        } else {
+                            log(`Empty line at issues row ${index + 1}, skipped`);
+                        }
+                    });
+                    db.run('COMMIT');
+                    stmt.free();
+                    log(`Inserted ${validRowCount} valid rows into the issues table.`);
+                    log(`Skipped ${invalidRowCount} invalid rows.`);
+                });
+
+                hideSpinner(); // Hide spinner after file is loaded
+            };
+
+            reader.readAsText(file);
+        });
     </script>
 </body>
 
