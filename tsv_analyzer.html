@@ -489,43 +489,51 @@
 
         // Run SQL query
         function runQuery() {
+            // Clear previous results and show loading message
+            document.getElementById('filteredResultsArea').innerHTML = ''; // Clear previous results
+            document.getElementById('filteredRowsCount').textContent = 'Loading...'; // Show loading message
             showSpinner(); // Show spinner when running query
+
             const query = document.getElementById('sqlQuery').value;
-            perfMeasure('Run Query', () => {
-                try {
-                    log(`Executing query: ${query}`);
-                    const stmt = db.prepare(query);
-                    log(`Statement prepared: ${stmt}`); // Log the statement object
-                    
-                    // Get column names immediately after preparing the statement
-                    const columnNames = stmt.getColumnNames();
-                    log(`Column Names: ${columnNames.join(', ')}`); // Log column names
 
-                    const results = [];
-                    while (stmt.step()) {
-                        results.push(stmt.get());
-                    }
-                    stmt.free();
-                    log(`Query executed successfully. Result count: ${results.length}`);
+            // Use setTimeout to allow DOM updates to render
+            setTimeout(() => {
+                perfMeasure('Run Query', () => {
+                    try {
+                        log(`Executing query: ${query}`);
+                        const stmt = db.prepare(query);
+                        log(`Statement prepared: ${stmt}`); // Log the statement object
+                        
+                        // Get column names immediately after preparing the statement
+                        const columnNames = stmt.getColumnNames();
+                        log(`Column Names: ${columnNames.join(', ')}`); // Log column names
 
-                    // Check if column names are empty
-                    if (columnNames.length === 0) {
-                        log('No column names returned. Check the table structure.');
-                        const schema = db.exec("SELECT sql FROM sqlite_master WHERE type='table'").map(row => row.values[0]).join('\n');
-                        log(`Table Schema: ${schema}`);
-                    }
+                        const results = [];
+                        while (stmt.step()) {
+                            results.push(stmt.get());
+                        }
+                        stmt.free();
+                        log(`Query executed successfully. Result count: ${results.length}`);
 
-                    displayResults([{ columns: columnNames, values: results }]);
-                } catch (error) {
-                    logError('SQL Error:', error);
-                    document.getElementById('filteredResultsArea').innerHTML = `<p>Error: ${error.message}</p>`;
-                    log('Error details:', error);
-                    if (error.stack) {
-                        log('Error stack:', error.stack);
+                        // Check if column names are empty
+                        if (columnNames.length === 0) {
+                            log('No column names returned. Check the table structure.');
+                            const schema = db.exec("SELECT sql FROM sqlite_master WHERE type='table'").map(row => row.values[0]).join('\n');
+                            log(`Table Schema: ${schema}`);
+                        }
+
+                        displayResults([{ columns: columnNames, values: results }]);
+                    } catch (error) {
+                        logError('SQL Error:', error);
+                        document.getElementById('filteredResultsArea').innerHTML = `<p>Error: ${error.message}</p>`;
+                        log('Error details:', error);
+                        if (error.stack) {
+                            log('Error stack:', error.stack);
+                        }
                     }
-                }
-                hideSpinner(); // Hide spinner after query execution
-            });
+                    hideSpinner(); // Hide spinner after query execution
+                });
+            }, 0); // Delay execution to allow DOM updates
         }
 
         // Display query results
