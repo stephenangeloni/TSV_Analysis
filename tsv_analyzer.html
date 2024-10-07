@@ -300,6 +300,26 @@
         input:checked+.slider:before {
             transform: translateX(26px);
         }
+
+        /* Spinner styles */
+        .spinner {
+            position: fixed;
+            left: 50%;
+            top: 50%;
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3; /* Light grey */
+            border-top: 5px solid var(--ubs-red); /* Red */
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            z-index: 2000; /* Ensure it's above other elements */
+            transform: translate(-50%, -50%);
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 
@@ -331,6 +351,7 @@
             <div id="modalContent"></div>
         </div>
     </div>
+    <div id="spinner" class="spinner" style="display: none;"></div> <!-- Added spinner -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js"></script>
     <script>
         // Global variables
@@ -389,8 +410,19 @@
             return true;
         }
 
-        // File parsing
+        // Show spinner
+        function showSpinner() {
+            document.getElementById('spinner').style.display = 'block';
+        }
+
+        // Hide spinner
+        function hideSpinner() {
+            document.getElementById('spinner').style.display = 'none';
+        }
+
+        // Modify file input event listener
         document.getElementById('fileInput').addEventListener('change', (event) => {
+            showSpinner(); // Show spinner when file is loading
             const file = event.target.files[0];
             const reader = new FileReader();
 
@@ -446,6 +478,7 @@
 
                 // Display initial results
                 runQuery();
+                hideSpinner(); // Hide spinner after file is loaded
             };
 
             reader.readAsText(file);
@@ -453,6 +486,7 @@
 
         // Run SQL query
         function runQuery() {
+            showSpinner(); // Show spinner when running query
             const query = document.getElementById('sqlQuery').value;
             perfMeasure('Run Query', () => {
                 try {
@@ -487,6 +521,7 @@
                         log('Error stack:', error.stack);
                     }
                 }
+                hideSpinner(); // Hide spinner after query execution
             });
         }
 
