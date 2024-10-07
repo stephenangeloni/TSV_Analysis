@@ -81,7 +81,7 @@
             overflow-y: auto; /* Enable vertical scrolling */
         }
 
-        #fileInput {
+        #fileInputSREF {
             display: none;
         }
 
@@ -326,8 +326,8 @@
 <body>
     <div class="container">
         <div class="header">
-            <label for="fileInput" class="file-input-label">Choose File</label>
-            <input type="file" id="fileInput" accept=".tsv,.txt">
+            <label for="fileInputSREF" class="file-input-label">Choose SREF</label>
+            <input type="file" id="fileInputSREF" accept=".tsv,.txt">
             <div class="logo">Analyzer</div>
             <label class="switch">
                 <input type="checkbox" id="darkModeToggle">
@@ -421,7 +421,7 @@
         }
 
         // Modify file input event listener
-        document.getElementById('fileInput').addEventListener('change', (event) => {
+        document.getElementById('fileInputSREF').addEventListener('change', (event) => {
             showSpinner(); // Show spinner when file is loading
             const file = event.target.files[0];
             const reader = new FileReader();
@@ -437,7 +437,18 @@
                     db.run("DROP TABLE IF EXISTS sref"); // Drop the existing table
 
                     headers = lines[0].split('\t').map(h => h.trim());
-                    sanitizedHeaders = headers.map(sanitizeHeader);
+                    
+                    // Validate the number of columns
+                    if (headers.length !== 7) {
+                        logError('Invalid number of columns. Expected 7 columns.');
+                        alert('Error: The file must contain exactly 7 columns.');
+                        hideSpinner(); // Hide spinner if there's an error
+                        return; // Exit the function if validation fails
+                    }
+
+                    // Rename headers to match the required names
+                    const requiredHeaders = ['LIB', 'FIL', 'MBR', 'TYP', 'SEQ', 'DATE', 'DATA'];
+                    sanitizedHeaders = requiredHeaders.map(sanitizeHeader);
                     log(`Original Headers: ${headers.join(', ')}`);
                     log(`Sanitized Headers: ${sanitizedHeaders.join(', ')}`);
 
@@ -549,12 +560,10 @@
 
             let tableHTML = '<div class="table-container"><table>';
 
-            // Create header
+            // Create header row
             tableHTML += '<thead><tr>';
-            results[0].columns.forEach(column => {
-                const originalHeader = headers[sanitizedHeaders.indexOf(column)] || column;
-                log(`Column: ${column}, Original Header: ${originalHeader}`); // Added logging
-                tableHTML += `<th>${escapeHTML(originalHeader)}</th>`;
+            ['LIB', 'FIL', 'MBR', 'TYP', 'SEQ', 'DATE', 'DATA'].forEach(column => {
+                tableHTML += `<th>${escapeHTML(column)}</th>`;
             });
             tableHTML += '</tr></thead>';
 
