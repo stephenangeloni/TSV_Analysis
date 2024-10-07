@@ -11,12 +11,12 @@
             --ubs-dark-gray: #2C2C2C;
             --ubs-light-gray: #F5F5F5;
             --ubs-white: #FFFFFF;
-            --background-color: var(--ubs-white);
-            --text-color: var(--ubs-dark-gray);
-            --header-background: var(--ubs-white);
-            --content-background: var(--ubs-light-gray);
-            --table-even-row: var(--ubs-light-gray);
-            --modal-background: rgba(0, 0, 0, 0.7);
+            --background-color: #F0F4F8; /* Softer light background */
+            --text-color: #333333; /* Darker text for better readability */
+            --header-background: #FFFFFF; /* Light header */
+            --content-background: #FFFFFF; /* Light content background */
+            --table-even-row: #E9E9E9; /* Softer even row color */
+            --modal-background: rgba(0, 0, 0, 0.8); /* Darker modal background */
             --code-background: #f4f4f4;
             --code-text: #333;
             --toggle-background: #ccc;
@@ -24,12 +24,12 @@
         }
 
         body.dark-mode {
-            --background-color: #121212;
-            --text-color: #E0E0E0;
-            --header-background: #1E1E1E;
-            --content-background: #2C2C2C;
-            --table-even-row: #3A3A3A;
-            --modal-background: rgba(255, 255, 255, 0.1);
+            --background-color: #1E1E1E; /* Darker background for dark mode */
+            --text-color: #E0E0E0; /* Lighter text for dark mode */
+            --header-background: #2C2C2C; /* Dark header */
+            --content-background: #2C2C2C; /* Dark content background */
+            --table-even-row: #3A3A3A; /* Darker even row color */
+            --modal-background: rgba(255, 255, 255, 0.1); /* Softer modal background */
             --code-background: #2d2d2d;
             --code-text: #e0e0e0;
             --toggle-background: #444444;
@@ -41,8 +41,8 @@
             height: 100%;
             margin: 0;
             padding: 0;
-            font-family: Helvetica, Arial, sans-serif;
-            line-height: 1.4;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Modern font */
+            line-height: 1.6; /* Increased line height for better readability */
             background-color: var(--background-color);
             color: var(--text-color);
         }
@@ -50,7 +50,9 @@
         .container {
             display: flex;
             flex-direction: column;
-            height: 100vh; // Set height to 100% of the viewport height
+            height: 100vh; /* Set height to 100% of the viewport height */
+            border-radius: 8px; /* Rounded corners for the container */
+            overflow: hidden; /* Prevent overflow */
         }
 
         .header {
@@ -60,7 +62,8 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 3px solid var(--ubs-red);
+            border-bottom: 2px solid var(--ubs-red);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
         }
 
         .logo {
@@ -69,12 +72,13 @@
         }
 
         .content {
-            flex: 1; // Allow content to grow and fill available space
+            flex: 1; /* Allow content to grow and fill available space */
             padding: 20px;
             background-color: var(--content-background);
             width: calc(100% - 40px);
             box-sizing: border-box;
             margin: 0 auto;
+            overflow-y: auto; /* Enable vertical scrolling */
         }
 
         #fileInput {
@@ -85,11 +89,12 @@
             background-color: var(--header-background);
             color: var(--text-color);
             padding: 10px 20px;
-            border-radius: 4px;
+            border-radius: 20px; /* Rounded corners */
             cursor: pointer;
             font-size: 16px;
             transition: background-color 0.3s;
             border: 1px solid var(--text-color);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
         }
 
         .file-input-label:hover {
@@ -126,38 +131,43 @@
             cursor: pointer;
             font-weight: bold;
             font-size: 16px;
-            border-radius: 4px;
-            transition: background-color 0.3s;
+            border-radius: 20px; /* Rounded corners */
+            transition: background-color 0.3s, transform 0.2s; /* Added transform for hover effect */
         }
 
         #runQuery:hover {
             background-color: #D10014;
+            transform: scale(1.05); /* Slightly enlarge on hover */
         }
 
         #filteredResultsArea {
             background-color: var(--background-color);
             border: 1px solid var(--text-color);
             padding: 20px;
-            overflow-x: auto;
-            flex: 1; // Allow filtered results area to grow and fill available space
+            overflow-y: auto; /* Enable vertical scrolling */
+            flex: 1; /* Allow filtered results area to grow and fill available space */
         }
 
         .table-container {
             overflow-x: auto;
-            flex: 1; // Allow the table container to grow and fill available space
+            flex: 1; /* Allow the table container to grow and fill available space */
+            border-radius: 8px; /* Rounded corners */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
         }
 
         table {
             width: 100%;
             font-size: 14px;
-            line-height: 1.2;
+            line-height: 1.4; /* Increased line height for better readability */
             border-spacing: 0;
             border-collapse: separate;
+            border-radius: 8px; /* Rounded corners */
+            overflow: hidden; /* Prevent overflow */
         }
 
         th,
         td {
-            padding: 8px;
+            padding: 12px; /* Increased padding for better spacing */
             text-align: left;
             border-bottom: 1px solid var(--text-color);
         }
@@ -205,6 +215,9 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
+            border-radius: 8px; /* Rounded corners for modal */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Subtle shadow */
+            overflow-y: auto; /* Enable vertical scrolling in modal */
         }
 
         .close {
@@ -213,6 +226,7 @@
             font-size: 28px;
             font-weight: bold;
             cursor: pointer;
+            transition: color 0.3s; /* Smooth color transition */
         }
 
         .close:hover,
