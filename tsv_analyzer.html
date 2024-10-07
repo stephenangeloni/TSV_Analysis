@@ -433,6 +433,9 @@
                     const lines = content.split('\n');
                     log(`Total lines in file: ${lines.length}`);
 
+                    // Clear existing table before loading new data
+                    db.run("DROP TABLE IF EXISTS data"); // Drop the existing table
+
                     headers = lines[0].split('\t').map(h => h.trim());
                     sanitizedHeaders = headers.map(sanitizeHeader);
                     log(`Original Headers: ${headers.join(', ')}`);
