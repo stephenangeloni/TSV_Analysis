@@ -338,7 +338,7 @@
             <div id="filteredRowsCount"></div>
             <div class="filter-container">
                 <textarea id="sqlQuery"
-                    placeholder="Enter your SQL query here...">SELECT * FROM data LIMIT 1000</textarea>
+                    placeholder="Enter your SQL query here...">SELECT * FROM sref LIMIT 1000</textarea>
                 <button id="runQuery">Run Query</button>
             </div>
             <div id="filteredResultsArea"></div>
@@ -434,7 +434,7 @@
                     log(`Total lines in file: ${lines.length}`);
 
                     // Clear existing table before loading new data
-                    db.run("DROP TABLE IF EXISTS data"); // Drop the existing table
+                    db.run("DROP TABLE IF EXISTS sref"); // Drop the existing table
 
                     headers = lines[0].split('\t').map(h => h.trim());
                     sanitizedHeaders = headers.map(sanitizeHeader);
@@ -442,7 +442,7 @@
                     log(`Sanitized Headers: ${sanitizedHeaders.join(', ')}`);
 
                     // Create table
-                    const createTableSQL = `CREATE TABLE data (${sanitizedHeaders.map(h => `"${h}" TEXT`).join(', ')})`;
+                    const createTableSQL = `CREATE TABLE sref (${sanitizedHeaders.map(h => `"${h}" TEXT`).join(', ')})`;
                     log(`Creating table with SQL: ${createTableSQL}`);
                     db.run(createTableSQL);
 
@@ -452,7 +452,7 @@
                     }
 
                     // Insert data
-                    const stmt = db.prepare(`INSERT INTO data VALUES (${sanitizedHeaders.map(() => '?').join(', ')})`);
+                    const stmt = db.prepare(`INSERT INTO sref VALUES (${sanitizedHeaders.map(() => '?').join(', ')})`);
                     log('Prepared statement for data insertion');
                     db.run('BEGIN TRANSACTION');
                     let validRowCount = 0;
@@ -602,7 +602,7 @@
 
             const query = `
                 SELECT "${lastColumn}"
-                FROM data
+                FROM sref
                 WHERE "${sanitizedHeaders[0]}" = ? AND "${sanitizedHeaders[1]}" = ? AND "${sanitizedHeaders[2]}" = ?
             `;
 
@@ -629,6 +629,7 @@
 
         // Display modal with matching data
         function displayModal(results, modalHeaderColumns, clickedValue) {
+            showSpinner();
             log('Displaying modal for:', modalHeaderColumns.join(' | '));
             const modalHeader = document.getElementById('modalHeader');
             const modalContent = document.getElementById('modalContent');
@@ -653,6 +654,7 @@
             }
 
             modal.style.display = 'block';
+            hideSpinner();
         }
 
         // Helper function to escape HTML special characters
