@@ -112,26 +112,18 @@
         }
 
         .file-input-label {
-
-            background-color: var(--header-background);
-            color: var(--text-color);
-            padding: 5px 10px;
-            border-radius: 10px;
-            /* Rounded corners */
+            background-color: var(--ubs-red); /* Change background color to match Run Query */
+            color: var(--ubs-white); /* Change text color to match Run Query */
+            border: none; /* Remove border */
+            padding: 10px 20px; /* Match padding of Run Query */
             cursor: pointer;
-            font-size: 18px;
-            transition: background-color 0.3s;
-            border: 1px solid var(--text-color);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            /* Subtle shadow */
-            margin-right: 2px;
-            /* Set to a smaller value for closer spacing */
-            display: inline-block;
-            /* Ensure labels are inline */
+            font-weight: bold; /* Make text bold */
+            border-radius: 10px; /* Rounded corners */
+            transition: background-color 0.3s, transform 0.2s; /* Add transition for hover effect */
         }
 
         .file-input-label:hover {
-            background-color: var(--content-background);
+            background-color: #D10014; /* Change hover color to match Run Query */
         }
 
         #filteredRowsCount {
@@ -459,7 +451,7 @@
                 <textarea id="sqlQuery" placeholder="select * from sref where (mbr) 
 in (select mbr from issues
        where relobj='FDBCLI' or reltype like '%file%' or issue like '%someproblem%')">select * from sref where (mbr) 
-in (select mbr from issues)</textarea>
+in (select mbr from issues) limit 100</textarea>
                 <button id="runQuery">Run Query</button>
             </div>
             <div id="filteredResultsArea"></div>
@@ -551,6 +543,7 @@ in (select mbr from issues)</textarea>
         document.getElementById('loadSREF').addEventListener('change', (event) => {
             showSpinner(); // Show spinner when file is loading
             const file = event.target.files[0];
+            document.querySelector('.logo').textContent = 'Analyzer'; // Reset header to Analyzer
 
             // Clear existing table before loading new data
             db.run("DROP TABLE IF EXISTS sref"); // Drop the existing table
@@ -586,6 +579,9 @@ in (select mbr from issues)</textarea>
                         hideSpinner(); // Hide spinner if there's an error
                         return; // Exit the function if validation fails
                     }
+
+                    // Set header to "Analyzing [filename]" after loading data
+                    document.querySelector('.logo').textContent = `Analyzing ${file.name}`;
 
                     const stmt = db.prepare(`INSERT INTO sref VALUES (${srefHeaders.map(() => '?').join(', ')})`);
 
@@ -904,6 +900,13 @@ in (select mbr from issues)</textarea>
         // Add event listener for the Run Query button
         document.getElementById('runQuery').addEventListener('click', runQuery);
 
+        // Add event listener for the SQL query textarea
+        document.getElementById('sqlQuery').addEventListener('keydown', (event) => {
+            if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {
+                runQuery(); // Execute the query when Command/Ctrl + Enter is pressed
+            }
+        });
+
         // Dark mode toggle
         const darkModeToggle = document.getElementById('darkModeToggle');
         darkModeToggle.addEventListener('change', () => {
@@ -926,6 +929,38 @@ in (select mbr from issues)</textarea>
                 log('Modal closed by clicking outside');
             }
         }
+
+        document.addEventListener('keydown', (event) => {
+            const contentDiv = document.querySelector('.content');
+
+            // Page Up / Page Down: Scroll by page
+            if (event.key === 'PageUp') {
+                event.preventDefault(); // Prevent default scrolling
+                contentDiv.scrollBy({ top: -contentDiv.clientHeight });
+            } else if (event.key === 'PageDown') {
+                event.preventDefault(); // Prevent default scrolling
+                contentDiv.scrollBy({ top: contentDiv.clientHeight });
+            }
+
+            // Command (or Ctrl) + Up / Down: Go to top or bottom
+            if ((event.metaKey || event.ctrlKey) && (event.key === 'ArrowUp' || event.key === 'ArrowDown')) {
+                event.preventDefault(); // Prevent default scrolling
+                if (event.key === 'ArrowUp') {
+                    contentDiv.scrollTo({ top: 0, behavior: 'smooth' });
+                } else {
+                    contentDiv.scrollTo({ top: contentDiv.scrollHeight, behavior: 'smooth' });
+                }
+            }
+
+            // Up / Down Arrow: Scroll by line
+            if (event.key === 'ArrowUp') {
+                event.preventDefault(); // Prevent default scrolling
+                contentDiv.scrollBy({ top: -20, behavior: 'smooth' }); // Adjust the value for line height
+            } else if (event.key === 'ArrowDown') {
+                event.preventDefault(); // Prevent default scrolling
+                contentDiv.scrollBy({ top: 20, behavior: 'smooth' }); // Adjust the value for line height
+            }
+        });
 
     </script>
 </body>
