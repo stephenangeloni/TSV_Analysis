@@ -829,6 +829,8 @@ in (select mbr from issues)</textarea>
             if (dataTabButton) {
                 dataTabButton.classList.add('active'); // Set data tab button as active
             }
+            dataContent.style.display = 'block'; // Show data content
+            issuesContent.style.display = 'none'; // Hide issues content
             tabButtons.forEach(button => {
                 button.addEventListener('click', () => {
                     tabButtons.forEach(btn => btn.classList.remove('active'));
