@@ -723,7 +723,7 @@ in (select mbr from issues)</textarea>
             }
         }
 
-        // Display modal with matching data
+        // Display modal with matching data and related issues
         function displayModal(results, modalHeaderColumns, clickedValue) {
             showSpinner();
             log('Displaying modal for:', modalHeaderColumns.join(' | '));
@@ -731,10 +731,32 @@ in (select mbr from issues)</textarea>
             const modalContent = document.getElementById('modalContent');
             const modal = document.getElementById('myModal');
 
+            // Set the header text
             modalHeader.textContent = modalHeaderColumns.join(' | ');
 
+            // Create tab bar
+            const tabBarHTML = `
+                <div class="tab-bar" style="display: flex; justify-content: flex-end;">
+                    <button class="tab-button active" data-tab="data">Data</button>
+                    <button class="tab-button" data-tab="issues">Related Issues</button>
+                </div>
+            `;
+            // Set the tab bar HTML to the modalHeader
+            modalHeader.innerHTML += tabBarHTML; // Append tab bar to modalHeader
+
+            // Create content divs for data and issues
+            const dataContent = document.createElement('div');
+            dataContent.id = 'dataContent';
+            dataContent.className = 'tab-content active';
+            const issuesContent = document.createElement('div');
+            issuesContent.id = 'issuesContent';
+            issuesContent.className = 'tab-content';
+
+            modalContent.appendChild(dataContent); // Append data content
+            modalContent.appendChild(issuesContent); // Append issues content
+
             if (results.length === 0 || results[0].values.length === 0) {
-                modalContent.textContent = 'No matching data found.';
+                dataContent.textContent = 'No matching data found.';
                 log('No matching data found for modal');
             } else {
                 let contentText = '';
@@ -745,12 +767,70 @@ in (select mbr from issues)</textarea>
                         contentText += `${escapeHTML(row[0])}\n`;
                     }
                 });
-                modalContent.innerHTML = contentText;
+                dataContent.innerHTML = contentText;
                 log(`Modal content set with ${results[0].values.length} rows`);
             }
 
+            // Fetch and display related issues
+            const lib = modalHeaderColumns[0];
+            const mbr = modalHeaderColumns[2];
+            fetchRelatedIssues(lib, mbr, issuesContent);
+
             modal.style.display = 'block';
             hideSpinner();
+
+            // Add event listeners for tab buttons
+            const tabButtons = document.querySelectorAll('.tab-button');
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    if (button.dataset.tab === 'data') {
+                        dataContent.classList.add('active');
+                        issuesContent.classList.remove('active');
+                    } else {
+                        dataContent.classList.remove('active');
+                        issuesContent.classList.add('active');
+                    }
+                });
+            });
+        }
+
+        // Fetch related issues
+        function fetchRelatedIssues(lib, mbr, container) {
+            const query = `
+                SELECT ISSUE, RELOBJ, RELTYPE
+                FROM issues
+                WHERE LIB = ? AND MBR = ?
+            `;
+
+            try {
+                log('Executing related issues query:', query);
+                log('Parameters:', lib, mbr);
+                const stmt = db.prepare(query);
+                stmt.bind([lib, mbr]);
+                const results = [];
+                while (stmt.step()) {
+                    results.push(stmt.get());
+                }
+                stmt.free();
+                log(`Related issues query executed successfully. Result count: ${results.length}`);
+
+                // Display related issues
+                if (results.length === 0) {
+                    container.textContent = 'No related issues found.';
+                } else {
+                    let issuesHTML = '<table><thead><tr><th>Issue</th><th>Related Object</th><th>Related Type</th></tr></thead><tbody>';
+                    results.forEach(row => {
+                        issuesHTML += `<tr><td>${escapeHTML(row[0])}</td><td>${escapeHTML(row[1])}</td><td>${escapeHTML(row[2])}</td></tr>`;
+                    });
+                    issuesHTML += '</tbody></table>';
+                    container.innerHTML = issuesHTML;
+                }
+            } catch (error) {
+                logError('SQL Error:', error);
+                container.textContent = 'Error fetching related issues.';
+            }
         }
 
         // Helper function to escape HTML special characters
