@@ -394,6 +394,29 @@
             text-align: center;
             /* Center the text */
         }
+
+        .tab-bar {
+            display: flex;
+            border-bottom: 2px solid var(--ubs-red); /* Add a bottom border for the tab bar */
+        }
+
+        .tab-button {
+            flex: 1; /* Make buttons take equal space */
+            padding: 10px; /* Add padding for better touch targets */
+            text-align: center; /* Center the text */
+            background-color: var(--background-color); /* Default background */
+            border: none; /* Remove default border */
+            cursor: pointer; /* Pointer cursor on hover */
+            transition: background-color 0.3s, color 0.3s; /* Smooth transition */
+            font-weight: bold; /* Make text bold */
+        }
+
+        .tab-button.active {
+            background-color: var(--ubs-red); /* Active tab background */
+            color: var(--ubs-white); /* Active tab text color */
+            border-radius: 5px 5px 0 0; /* Rounded corners on top */
+        }
+
     </style>
 </head>
 
@@ -429,7 +452,13 @@ in (select mbr from issues)</textarea>
     <div id="myModal" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
-            <div id="modalHeader"></div>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div id="modalHeader"></div>
+                <div class="tab-bar">
+                    <button class="tab-button active" data-tab="data">Data</button>
+                    <button class="tab-button" data-tab="issues">Related Issues</button>
+                </div>
+            </div>
             <div id="modalContent"></div>
         </div>
     </div>
@@ -734,23 +763,13 @@ in (select mbr from issues)</textarea>
             // Set the header text
             modalHeader.textContent = modalHeaderColumns.join(' | ');
 
-            // Create tab bar
-            const tabBarHTML = `
-                <div class="tab-bar" style="display: flex; justify-content: flex-end;">
-                    <button class="tab-button active" data-tab="data">Data</button>
-                    <button class="tab-button" data-tab="issues">Related Issues</button>
-                </div>
-            `;
-            // Set the tab bar HTML to the modalHeader
-            modalHeader.innerHTML += tabBarHTML; // Append tab bar to modalHeader
-
             // Create content divs for data and issues
             const dataContent = document.createElement('div');
             dataContent.id = 'dataContent';
-            dataContent.className = 'tab-content active';
+            dataContent.className = 'tab-content active'; // Initially active
             const issuesContent = document.createElement('div');
             issuesContent.id = 'issuesContent';
-            issuesContent.className = 'tab-content';
+            issuesContent.className = 'tab-content'; // Initially inactive
 
             modalContent.appendChild(dataContent); // Append data content
             modalContent.appendChild(issuesContent); // Append issues content
@@ -786,11 +805,11 @@ in (select mbr from issues)</textarea>
                     tabButtons.forEach(btn => btn.classList.remove('active'));
                     button.classList.add('active');
                     if (button.dataset.tab === 'data') {
-                        dataContent.classList.add('active');
-                        issuesContent.classList.remove('active');
+                        dataContent.style.display = 'block'; // Show data content
+                        issuesContent.style.display = 'none'; // Hide issues content
                     } else {
-                        dataContent.classList.remove('active');
-                        issuesContent.classList.add('active');
+                        dataContent.style.display = 'none'; // Hide data content
+                        issuesContent.style.display = 'block'; // Show issues content
                     }
                 });
             });
