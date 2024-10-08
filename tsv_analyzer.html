@@ -112,18 +112,26 @@
         }
 
         .file-input-label {
-            background-color: var(--ubs-red); /* Change background color to match Run Query */
-            color: var(--ubs-white); /* Change text color to match Run Query */
-            border: none; /* Remove border */
-            padding: 10px 20px; /* Match padding of Run Query */
+            background-color: var(--ubs-red);
+            /* Change background color to match Run Query */
+            color: var(--ubs-white);
+            /* Change text color to match Run Query */
+            border: none;
+            /* Remove border */
+            padding: 10px 20px;
+            /* Match padding of Run Query */
             cursor: pointer;
-            font-weight: bold; /* Make text bold */
-            border-radius: 10px; /* Rounded corners */
-            transition: background-color 0.3s, transform 0.2s; /* Add transition for hover effect */
+            font-weight: bold;
+            /* Make text bold */
+            border-radius: 10px;
+            /* Rounded corners */
+            transition: background-color 0.3s, transform 0.2s;
+            /* Add transition for hover effect */
         }
 
         .file-input-label:hover {
-            background-color: #D10014; /* Change hover color to match Run Query */
+            background-color: #D10014;
+            /* Change hover color to match Run Query */
         }
 
         #filteredRowsCount {
@@ -410,11 +418,13 @@
             /* Smooth transition */
             font-weight: bold;
             /* Make text bold */
-            color: var(--text-color); /* Default text color */
+            color: var(--text-color);
+            /* Default text color */
         }
 
         body.dark-mode .tab-button {
-            color: var(--ubs-white); /* Change text color to white in dark mode */
+            color: var(--ubs-white);
+            /* Change text color to white in dark mode */
         }
 
         .tab-button.active {
@@ -472,6 +482,7 @@ in (select mbr from issues) limit 100</textarea>
     </div>
     <div id="spinner" class="spinner" style="display: none;"></div> <!-- Added spinner -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js"></script>
+    <script type="text/javascript" src="https://unpkg.com/sql-formatter-plus@latest/dist/sql-formatter.min.js"></script>
     <script>
         // Global variables
         let db;
@@ -634,7 +645,12 @@ in (select mbr from issues) limit 100</textarea>
             showSpinner(); // Show spinner when running query
 
             const query = document.getElementById('sqlQuery').value;
+            const formattedQuery = sqlFormatter.format(query);
 
+            const sqlQueryTextarea = document.getElementById('sqlQuery');
+            sqlQueryTextarea.value = formattedQuery;
+            autoResizeTextarea(sqlQueryTextarea);
+            
             // Use setTimeout to allow DOM updates to render
             setTimeout(() => {
                 perfMeasure('Run Query', () => {
@@ -961,6 +977,19 @@ in (select mbr from issues) limit 100</textarea>
                 contentDiv.scrollBy({ top: 20, behavior: 'smooth' }); // Adjust the value for line height
             }
         });
+
+        // Function to auto-resize the textarea
+        function autoResizeTextarea(textarea) {
+            textarea.style.height = 'auto'; // Reset height
+            textarea.style.height = `${textarea.scrollHeight}px`; // Set to scroll height
+        }
+
+        // Add event listener for the SQL query textarea
+        const sqlQueryTextarea = document.getElementById('sqlQuery');
+        sqlQueryTextarea.addEventListener('input', () => autoResizeTextarea(sqlQueryTextarea));
+        
+        // Initial resize to fit content
+        autoResizeTextarea(sqlQueryTextarea);
 
     </script>
 </body>
