@@ -968,6 +968,11 @@ in (select mbr from issues) limit 100</textarea>
                 }
             }
 
+                        // Ignore keydown events if the target is the sqlQuery textarea
+            if (event.target === document.getElementById('sqlQuery')) {
+                return; // Do nothing if the textarea is focused
+            }
+
             // Up / Down Arrow: Scroll by line
             if (event.key === 'ArrowUp') {
                 event.preventDefault(); // Prevent default scrolling
