@@ -112,13 +112,14 @@
         }
 
         .file-input-label {
+            
             background-color: var(--header-background);
             color: var(--text-color);
-            padding: 10px 20px;
-            border-radius: 20px;
+            padding: 5px 10px;
+            border-radius: 10px;
             /* Rounded corners */
             cursor: pointer;
-            font-size: 16px;
+            font-size: 18px;
             transition: background-color 0.3s;
             border: 1px solid var(--text-color);
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -163,7 +164,7 @@
             cursor: pointer;
             font-weight: bold;
             font-size: 16px;
-            border-radius: 20px;
+            border-radius: 10px;
             /* Rounded corners */
             transition: background-color 0.3s, transform 0.2s;
             /* Added transform for hover effect */
@@ -171,7 +172,6 @@
 
         #runQuery:hover {
             background-color: #D10014;
-            transform: scale(1.05);
             /* Slightly enlarge on hover */
         }
 
@@ -401,7 +401,7 @@
     <div class="container">
         <div class="header">
             <div class="file-inputs">
-                <label for="loadSREF" class="file-input-label">Load SREF</label>
+                <label for="loadSREF" class="file-input-label">Load Ref Analysis</label>
                 <input type="file" id="loadSREF" accept=".tsv,.txt">
             </div>
 
@@ -512,7 +512,7 @@ in (select mbr from issues)</textarea>
             db.run("DROP TABLE IF EXISTS issues"); // Drop the existing table
 
             // Rename headers to match the required names
-            const srefHeaders = ['LIB', 'FIL', 'MBR', 'TYP', 'SEQ', 'DATE', 'DATA'];
+            srefHeaders = ['LIB', 'FIL', 'MBR', 'TYP', 'SEQ', 'DATE', 'DATA'];
 
             const createTableSQL = `CREATE TABLE sref (${srefHeaders.map(h => `"${h}" TEXT`).join(', ')})`;
             db.run(createTableSQL);
