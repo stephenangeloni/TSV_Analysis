@@ -902,7 +902,7 @@ in (select mbr from issues) limit 100</textarea>
 
         // Add event listener for the SQL query textarea
         document.getElementById('sqlQuery').addEventListener('keydown', (event) => {
-            if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {
+            if ((event.ctrlKey || event.metaKey || event.keyCode === 17) && event.key === 'Enter') {
                 runQuery(); // Execute the query when Command/Ctrl + Enter is pressed
             }
         });
