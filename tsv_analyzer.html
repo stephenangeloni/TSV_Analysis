@@ -946,19 +946,17 @@ in (select mbr from issues) limit 100</textarea>
             }
         }
 
-        // Move the event listener to the modal itself
-        modal.addEventListener('keydown', (event) => {
-            if (event.key === 'Escape') {
-                modal.style.display = 'none';
-                log('Modal closed by Escape key');
-            }
-        });
-
-        // Ensure the modal can receive focus
-        modal.setAttribute('tabindex', '0'); // Make modal focusable
 
         document.addEventListener('keydown', (event) => {
+
+            if (event.key === 'Escape' && modal.style.display === 'block') {
+                modal.style.display = 'none';
+                log('Modal closed by Escape key');
+                return;
+            }
+
             const contentDiv = document.querySelector('.content');
+
 
             // Page Up / Page Down: Scroll by page
             if (event.key === 'PageUp') {
