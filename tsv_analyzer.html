@@ -11,12 +11,18 @@
             --ubs-dark-gray: #2C2C2C;
             --ubs-light-gray: #F5F5F5;
             --ubs-white: #FFFFFF;
-            --background-color: #F0F4F8; /* Softer light background */
-            --text-color: #333333; /* Darker text for better readability */
-            --header-background: #FFFFFF; /* Light header */
-            --content-background: #FFFFFF; /* Light content background */
-            --table-even-row: #E9E9E9; /* Softer even row color */
-            --modal-background: rgba(0, 0, 0, 0.8); /* Darker modal background */
+            --background-color: #F0F4F8;
+            /* Softer light background */
+            --text-color: #333333;
+            /* Darker text for better readability */
+            --header-background: #FFFFFF;
+            /* Light header */
+            --content-background: #FFFFFF;
+            /* Light content background */
+            --table-even-row: #E9E9E9;
+            /* Softer even row color */
+            --modal-background: rgba(0, 0, 0, 0.8);
+            /* Darker modal background */
             --code-background: #f4f4f4;
             --code-text: #333;
             --toggle-background: #ccc;
@@ -24,12 +30,18 @@
         }
 
         body.dark-mode {
-            --background-color: #1E1E1E; /* Darker background for dark mode */
-            --text-color: #E0E0E0; /* Lighter text for dark mode */
-            --header-background: #2C2C2C; /* Dark header */
-            --content-background: #2C2C2C; /* Dark content background */
-            --table-even-row: #3A3A3A; /* Darker even row color */
-            --modal-background: rgba(255, 255, 255, 0.1); /* Softer modal background */
+            --background-color: #1E1E1E;
+            /* Darker background for dark mode */
+            --text-color: #E0E0E0;
+            /* Lighter text for dark mode */
+            --header-background: #2C2C2C;
+            /* Dark header */
+            --content-background: #2C2C2C;
+            /* Dark content background */
+            --table-even-row: #3A3A3A;
+            /* Darker even row color */
+            --modal-background: rgba(255, 255, 255, 0.1);
+            /* Softer modal background */
             --code-background: #2d2d2d;
             --code-text: #e0e0e0;
             --toggle-background: #444444;
@@ -41,8 +53,10 @@
             height: 100%;
             margin: 0;
             padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Modern font */
-            line-height: 1.6; /* Increased line height for better readability */
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            /* Modern font */
+            line-height: 1.6;
+            /* Increased line height for better readability */
             background-color: var(--background-color);
             color: var(--text-color);
         }
@@ -50,35 +64,47 @@
         .container {
             display: flex;
             flex-direction: column;
-            height: 100vh; /* Set height to 100% of the viewport height */
-            border-radius: 8px; /* Rounded corners for the container */
-            overflow: hidden; /* Prevent overflow */
+            height: 100vh;
+            /* Set height to 100% of the viewport height */
+            border-radius: 8px;
+            /* Rounded corners for the container */
+            overflow: hidden;
+            /* Prevent overflow */
         }
 
         .header {
             background-color: var(--header-background);
             color: var(--text-color);
             padding: 20px;
-            display: flex; /* Use flexbox for the header */
-            align-items: center; /* Center items vertically */
-            justify-content: space-between; /* Space between items */
-            position: relative; /* Position relative for absolute centering */
+            display: flex;
+            /* Use flexbox for the header */
+            align-items: center;
+            /* Center items vertically */
+            justify-content: space-between;
+            /* Space between items */
+            position: relative;
+            /* Position relative for absolute centering */
         }
 
         .logo-container {
-            position: absolute; /* Position absolute to center the logo */
-            left: 50%; /* Move to the center */
-            transform: translateX(-50%); /* Adjust to center */
+            position: absolute;
+            /* Position absolute to center the logo */
+            left: 50%;
+            /* Move to the center */
+            transform: translateX(-50%);
+            /* Adjust to center */
         }
 
         .content {
-            flex: 1; /* Allow content to grow and fill available space */
+            flex: 1;
+            /* Allow content to grow and fill available space */
             padding: 20px;
             background-color: var(--content-background);
             width: calc(100% - 40px);
             box-sizing: border-box;
             margin: 0 auto;
-            overflow-y: auto; /* Enable vertical scrolling */
+            overflow-y: auto;
+            /* Enable vertical scrolling */
         }
 
         #loadSREF {
@@ -89,14 +115,18 @@
             background-color: var(--header-background);
             color: var(--text-color);
             padding: 10px 20px;
-            border-radius: 20px; /* Rounded corners */
+            border-radius: 20px;
+            /* Rounded corners */
             cursor: pointer;
             font-size: 16px;
             transition: background-color 0.3s;
             border: 1px solid var(--text-color);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
-            margin-right: 2px; /* Set to a smaller value for closer spacing */
-            display: inline-block; /* Ensure labels are inline */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            /* Subtle shadow */
+            margin-right: 2px;
+            /* Set to a smaller value for closer spacing */
+            display: inline-block;
+            /* Ensure labels are inline */
         }
 
         .file-input-label:hover {
@@ -133,43 +163,55 @@
             cursor: pointer;
             font-weight: bold;
             font-size: 16px;
-            border-radius: 20px; /* Rounded corners */
-            transition: background-color 0.3s, transform 0.2s; /* Added transform for hover effect */
+            border-radius: 20px;
+            /* Rounded corners */
+            transition: background-color 0.3s, transform 0.2s;
+            /* Added transform for hover effect */
         }
 
         #runQuery:hover {
             background-color: #D10014;
-            transform: scale(1.05); /* Slightly enlarge on hover */
+            transform: scale(1.05);
+            /* Slightly enlarge on hover */
         }
 
         #filteredResultsArea {
             background-color: var(--background-color);
             border: 1px solid var(--text-color);
             padding: 20px;
-            overflow-y: auto; /* Enable vertical scrolling */
-            flex: 1; /* Allow filtered results area to grow and fill available space */
+            overflow-y: auto;
+            /* Enable vertical scrolling */
+            flex: 1;
+            /* Allow filtered results area to grow and fill available space */
         }
 
         .table-container {
             overflow-x: auto;
-            flex: 1; /* Allow the table container to grow and fill available space */
-            border-radius: 8px; /* Rounded corners */
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+            flex: 1;
+            /* Allow the table container to grow and fill available space */
+            border-radius: 8px;
+            /* Rounded corners */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            /* Subtle shadow */
         }
 
         table {
             width: 100%;
             font-size: 14px;
-            line-height: 1.4; /* Increased line height for better readability */
+            line-height: 1.4;
+            /* Increased line height for better readability */
             border-spacing: 0;
             border-collapse: separate;
-            border-radius: 8px; /* Rounded corners */
-            overflow: hidden; /* Prevent overflow */
+            border-radius: 8px;
+            /* Rounded corners */
+            overflow: hidden;
+            /* Prevent overflow */
         }
 
         th,
         td {
-            padding: 12px; /* Increased padding for better spacing */
+            padding: 12px;
+            /* Increased padding for better spacing */
             text-align: left;
             border-bottom: 1px solid var(--text-color);
         }
@@ -217,9 +259,12 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            border-radius: 8px; /* Rounded corners for modal */
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Subtle shadow */
-            overflow-y: auto; /* Enable vertical scrolling in modal */
+            border-radius: 8px;
+            /* Rounded corners for modal */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            /* Subtle shadow */
+            overflow-y: auto;
+            /* Enable vertical scrolling in modal */
         }
 
         .close {
@@ -228,7 +273,8 @@
             font-size: 28px;
             font-weight: bold;
             cursor: pointer;
-            transition: color 0.3s; /* Smooth color transition */
+            transition: color 0.3s;
+            /* Smooth color transition */
         }
 
         .close:hover,
@@ -310,29 +356,43 @@
             top: 50%;
             width: 50px;
             height: 50px;
-            border: 5px solid #f3f3f3; /* Light grey */
-            border-top: 5px solid var(--ubs-red); /* Red */
+            border: 5px solid #f3f3f3;
+            /* Light grey */
+            border-top: 5px solid var(--ubs-red);
+            /* Red */
             border-radius: 50%;
             animation: spin 1s linear infinite;
-            z-index: 2000; /* Ensure it's above other elements */
+            z-index: 2000;
+            /* Ensure it's above other elements */
             transform: translate(-50%, -50%);
         }
 
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
         }
 
         .file-inputs {
-            display: flex; /* Use flexbox for the file inputs */
-            align-items: center; /* Center items vertically */
-            margin-right: auto; /* Push the logo and dark mode toggle to the right */
+            display: flex;
+            /* Use flexbox for the file inputs */
+            align-items: center;
+            /* Center items vertically */
+            margin-right: auto;
+            /* Push the logo and dark mode toggle to the right */
         }
 
         .logo {
-            font-size: 32px; /* Increase font size */
-            font-weight: bold; /* Make the text bold */
-            text-align: center; /* Center the text */
+            font-size: 32px;
+            /* Increase font size */
+            font-weight: bold;
+            /* Make the text bold */
+            text-align: center;
+            /* Center the text */
         }
     </style>
 </head>
@@ -343,15 +403,12 @@
             <div class="file-inputs">
                 <label for="loadSREF" class="file-input-label">Load SREF</label>
                 <input type="file" id="loadSREF" accept=".tsv,.txt">
-                
-                <label for="loadIssues" class="file-input-label">Load ISSUES</label>
-                <input type="file" id="loadIssues" accept=".tsv,.txt" style="display: none;"> <!-- Hidden input for issues -->
             </div>
-            
+
             <div class="logo-container">
                 <div class="logo">Analyzer</div>
             </div>
-            
+
             <label class="switch">
                 <input type="checkbox" id="darkModeToggle">
                 <span class="slider"></span>
@@ -360,12 +417,10 @@
         <div class="content">
             <div id="filteredRowsCount"></div>
             <div class="filter-container">
-                <textarea id="sqlQuery"
-                    placeholder=
-"select * from sref where (lib, mbr) 
-in (select lib, mbr from issues
-       where relobj='FDBCLI' or reltype like '%file%' or issue like '%someproblem%')">select * from sref where (lib, mbr) 
-in (select lib, mbr from issues</textarea>
+                <textarea id="sqlQuery" placeholder="select * from sref where (mbr) 
+in (select mbr from issues
+       where relobj='FDBCLI' or reltype like '%file%' or issue like '%someproblem%')">select * from sref where (mbr) 
+in (select mbr from issues)</textarea>
                 <button id="runQuery">Run Query</button>
             </div>
             <div id="filteredResultsArea"></div>
@@ -384,7 +439,7 @@ in (select lib, mbr from issues</textarea>
         // Global variables
         let db;
         let headers = [];
-        let sanitizedHeaders = [];
+        let srefHeaders = [];
 
         // Check if logging is enabled
         const isLoggingEnabled = new URLSearchParams(window.location.search).get('log') === '1';
@@ -451,70 +506,72 @@ in (select lib, mbr from issues</textarea>
         document.getElementById('loadSREF').addEventListener('change', (event) => {
             showSpinner(); // Show spinner when file is loading
             const file = event.target.files[0];
+
+            // Clear existing table before loading new data
+            db.run("DROP TABLE IF EXISTS sref"); // Drop the existing table
+            db.run("DROP TABLE IF EXISTS issues"); // Drop the existing table
+
+            // Rename headers to match the required names
+            const srefHeaders = ['LIB', 'FIL', 'MBR', 'TYP', 'SEQ', 'DATE', 'DATA'];
+
+            const createTableSQL = `CREATE TABLE sref (${srefHeaders.map(h => `"${h}" TEXT`).join(', ')})`;
+            db.run(createTableSQL);
+
+            // Define headers for the issues table
+            const issuesHeaders = ['LIB', 'MBR', 'ISSUE', 'RELOBJ', 'RELTYPE'];
+
+            // Create issues table
+            const createIssuesTableSQL = `CREATE TABLE issues (${issuesHeaders.map(h => `"${h}" TEXT`).join(', ')})`;
+            db.run(createIssuesTableSQL);
+
             const reader = new FileReader();
+
+            reader.readAsText(file);
 
             reader.onload = (e) => {
                 perfMeasure('File Parsing and DB Creation', () => {
-                    log('Starting file parsing');
                     const content = e.target.result;
                     const lines = content.split('\n');
-                    log(`Total lines in file: ${lines.length}`);
-
-                    // Clear existing table before loading new data
-                    db.run("DROP TABLE IF EXISTS sref"); // Drop the existing table
 
                     headers = lines[0].split('\t').map(h => h.trim());
-                    
+
                     // Validate the number of columns
                     if (headers.length !== 7) {
-                        logError('Invalid number of columns. Expected 7 columns.');
                         alert('Error: The file must contain exactly 7 columns.');
                         hideSpinner(); // Hide spinner if there's an error
                         return; // Exit the function if validation fails
                     }
 
-                    // Rename headers to match the required names
-                    const requiredHeaders = ['LIB', 'FIL', 'MBR', 'TYP', 'SEQ', 'DATE', 'DATA'];
-                    sanitizedHeaders = requiredHeaders.map(sanitizeHeader);
-                    log(`Original Headers: ${headers.join(', ')}`);
-                    log(`Sanitized Headers: ${sanitizedHeaders.join(', ')}`);
+                    const stmt = db.prepare(`INSERT INTO sref VALUES (${srefHeaders.map(() => '?').join(', ')})`);
 
-                    // Create table
-                    const createTableSQL = `CREATE TABLE sref (${sanitizedHeaders.map(h => `"${h}" TEXT`).join(', ')})`;
-                    log(`Creating table with SQL: ${createTableSQL}`);
-                    db.run(createTableSQL);
+                    db.run('BEGIN TRANSACTION');
+                    let validRowCount = 0;
+                    let invalidRowCount = 0;
+
+                    lines.slice(1).forEach((line, index) => {
+                        if (line.trim() !== '') {
+                            const row = line.split('\t');
+                            if (isValidRow(row)) {
+                                stmt.run(row);
+                                validRowCount++;
+                            } else {
+                                invalidRowCount++;
+                            }
+                        }
+                    });
+
+                    db.run('COMMIT');
+                    stmt.free();
+
+                    //db.run('BEGIN TRANSACTION');
+                    db.run("INSERT INTO ISSUES (LIB, MBR, ISSUE, RELOBJ, RELTYPE) SELECT LIB, FIL, MBR, TYP, DATA FROM SREF WHERE SEQ = '0';");
+                    db.run("DELETE FROM SREF WHERE SEQ = '0';");
+                    //db.run('COMMIT');
 
                     // Log database structure if logging is enabled
                     if (isLoggingEnabled) {
                         log('Database structure:', db.exec("SELECT sql FROM sqlite_master WHERE type='table'").map(row => row.values[0]).join('\n'));
                     }
-
-                    // Insert data
-                    const stmt = db.prepare(`INSERT INTO sref VALUES (${sanitizedHeaders.map(() => '?').join(', ')})`);
-                    log('Prepared statement for data insertion');
-                    db.run('BEGIN TRANSACTION');
-                    let validRowCount = 0;
-                    let invalidRowCount = 0;
-                    lines.slice(1).forEach((line, index) => {
-                        if (line.trim() !== '') {
-                            const row = line.split('\t');
-                            log(`Processing row ${index + 1}: ${row.join(' | ')}`);
-                            if (isValidRow(row)) {
-                                stmt.run(row);
-                                validRowCount++;
-                                log(`Row ${index + 1} is valid and inserted`);
-                            } else {
-                                invalidRowCount++;
-                                log(`Row ${index + 1} is invalid and skipped`);
-                            }
-                        } else {
-                            log(`Empty line at row ${index + 1}, skipped`);
-                        }
-                    });
-                    db.run('COMMIT');
-                    stmt.free();
-                    log(`Inserted ${validRowCount} valid rows into the database.`);
-                    log(`Skipped ${invalidRowCount} invalid rows.`);
                 });
 
                 // Display initial results
@@ -522,7 +579,10 @@ in (select lib, mbr from issues</textarea>
                 hideSpinner(); // Hide spinner after file is loaded
             };
 
-            reader.readAsText(file);
+            reader.onerror = (error) => {
+                hideSpinner();
+                alert('Error reading file. Please try again.');
+            };
         });
 
         // Run SQL query
@@ -541,7 +601,7 @@ in (select lib, mbr from issues</textarea>
                         log(`Executing query: ${query}`);
                         const stmt = db.prepare(query);
                         log(`Statement prepared: ${stmt}`); // Log the statement object
-                        
+
                         // Get column names immediately after preparing the statement
                         const columnNames = stmt.getColumnNames();
                         log(`Column Names: ${columnNames.join(', ')}`); // Log column names
@@ -634,12 +694,12 @@ in (select lib, mbr from issues</textarea>
 
             const firstThreeColumns = Array.from(cells).slice(0, 3).map(cell => cell.textContent);
             const modalHeaderColumns = Array.from(cells).slice(0, 4).map(cell => cell.textContent);
-            const lastColumn = sanitizedHeaders[sanitizedHeaders.length - 1];
+            const lastColumn = srefHeaders[srefHeaders.length - 1];
 
             const query = `
                 SELECT "${lastColumn}"
                 FROM sref
-                WHERE "${sanitizedHeaders[0]}" = ? AND "${sanitizedHeaders[1]}" = ? AND "${sanitizedHeaders[2]}" = ?
+                WHERE "${srefHeaders[0]}" = ? AND "${srefHeaders[1]}" = ? AND "${srefHeaders[2]}" = ?
             `;
 
             try {
@@ -729,64 +789,6 @@ in (select lib, mbr from issues</textarea>
             }
         }
 
-        // Add this new event listener for loading issues
-        document.getElementById('loadIssues').addEventListener('change', (event) => {
-            showSpinner(); // Show spinner when file is loading
-            const file = event.target.files[0];
-            const reader = new FileReader();
-
-            reader.onload = (e) => {
-                perfMeasure('Issues File Parsing and DB Creation', () => {
-                    log('Starting issues file parsing');
-                    const content = e.target.result;
-                    const lines = content.split('\n');
-                    log(`Total lines in issues file: ${lines.length}`);
-
-                    // Clear existing issues table before loading new data
-                    db.run("DROP TABLE IF EXISTS issues"); // Drop the existing table
-
-                    // Define headers for the issues table
-                    const issuesHeaders = ['LIB', 'MBR', 'ISSUE', 'RELOBJ', 'RELTYPE'];
-                    const sanitizedIssuesHeaders = issuesHeaders.map(sanitizeHeader);
-                    
-                    // Create issues table
-                    const createIssuesTableSQL = `CREATE TABLE issues (${sanitizedIssuesHeaders.map(h => `"${h}" TEXT`).join(', ')})`;
-                    log(`Creating issues table with SQL: ${createIssuesTableSQL}`);
-                    db.run(createIssuesTableSQL);
-
-                    // Insert data into issues table
-                    const stmt = db.prepare(`INSERT INTO issues VALUES (${sanitizedIssuesHeaders.map(() => '?').join(', ')})`);
-                    log('Prepared statement for issues data insertion');
-                    db.run('BEGIN TRANSACTION');
-                    let validRowCount = 0;
-                    let invalidRowCount = 0;
-                    lines.slice(1).forEach((line, index) => {
-                        if (line.trim() !== '') {
-                            const row = line.split('\t');
-                            log(`Processing issues row ${index + 1}: ${row.join(' | ')}`);
-                            if (row.length === 5) { // Ensure the row has exactly 5 columns
-                                stmt.run(row);
-                                validRowCount++;
-                                log(`Issues row ${index + 1} is valid and inserted`);
-                            } else {
-                                invalidRowCount++;
-                                log(`Issues row ${index + 1} is invalid and skipped`);
-                            }
-                        } else {
-                            log(`Empty line at issues row ${index + 1}, skipped`);
-                        }
-                    });
-                    db.run('COMMIT');
-                    stmt.free();
-                    log(`Inserted ${validRowCount} valid rows into the issues table.`);
-                    log(`Skipped ${invalidRowCount} invalid rows.`);
-                });
-
-                hideSpinner(); // Hide spinner after file is loaded
-            };
-
-            reader.readAsText(file);
-        });
     </script>
 </body>
 
