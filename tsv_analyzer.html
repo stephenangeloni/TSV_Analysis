@@ -112,7 +112,7 @@
         }
 
         .file-input-label {
-            
+
             background-color: var(--header-background);
             color: var(--text-color);
             padding: 5px 10px;
@@ -397,26 +397,37 @@
 
         .tab-bar {
             display: flex;
-            border-bottom: 2px solid var(--ubs-red); /* Add a bottom border for the tab bar */
+            border-bottom: 2px solid var(--ubs-red);
+            /* Add a bottom border for the tab bar */
         }
 
         .tab-button {
-            flex: 1; /* Make buttons take equal space */
-            padding: 10px; /* Add padding for better touch targets */
-            text-align: center; /* Center the text */
-            background-color: var(--background-color); /* Default background */
-            border: none; /* Remove default border */
-            cursor: pointer; /* Pointer cursor on hover */
-            transition: background-color 0.3s, color 0.3s; /* Smooth transition */
-            font-weight: bold; /* Make text bold */
+            flex: 1;
+            /* Make buttons take equal space */
+            padding: 10px;
+            /* Add padding for better touch targets */
+            text-align: center;
+            /* Center the text */
+            background-color: var(--background-color);
+            /* Default background */
+            border: none;
+            /* Remove default border */
+            cursor: pointer;
+            /* Pointer cursor on hover */
+            transition: background-color 0.3s, color 0.3s;
+            /* Smooth transition */
+            font-weight: bold;
+            /* Make text bold */
         }
 
         .tab-button.active {
-            background-color: var(--ubs-red); /* Active tab background */
-            color: var(--ubs-white); /* Active tab text color */
-            border-radius: 5px 5px 0 0; /* Rounded corners on top */
+            background-color: var(--ubs-red);
+            /* Active tab background */
+            color: var(--ubs-white);
+            /* Active tab text color */
+            border-radius: 5px 5px 0 0;
+            /* Rounded corners on top */
         }
-
     </style>
 </head>
 
@@ -754,6 +765,7 @@ in (select mbr from issues)</textarea>
 
         // Display modal with matching data and related issues
         function displayModal(results, modalHeaderColumns, clickedValue) {
+
             showSpinner();
             log('Displaying modal for:', modalHeaderColumns.join(' | '));
             const modalHeader = document.getElementById('modalHeader');
@@ -771,8 +783,20 @@ in (select mbr from issues)</textarea>
             issuesContent.id = 'issuesContent';
             issuesContent.className = 'tab-content'; // Initially inactive
 
-            modalContent.appendChild(dataContent); // Append data content
-            modalContent.appendChild(issuesContent); // Append issues content
+            // Remove existing content if it exists
+            const existingDataContent = modalContent.querySelector('#dataContent');
+            const existingIssuesContent = modalContent.querySelector('#issuesContent');
+
+            if (existingDataContent) {
+                modalContent.removeChild(existingDataContent);
+            }
+            if (existingIssuesContent) {
+                modalContent.removeChild(existingIssuesContent);
+            }
+
+            // Append new content
+            modalContent.appendChild(dataContent);
+            modalContent.appendChild(issuesContent);
 
             if (results.length === 0 || results[0].values.length === 0) {
                 dataContent.textContent = 'No matching data found.';
@@ -793,13 +817,18 @@ in (select mbr from issues)</textarea>
             // Fetch and display related issues
             const lib = modalHeaderColumns[0];
             const mbr = modalHeaderColumns[2];
-            fetchRelatedIssues(lib, mbr, issuesContent);
+            fetchRelatedIssues(mbr, issuesContent);
 
             modal.style.display = 'block';
-            hideSpinner();
+
 
             // Add event listeners for tab buttons
             const tabButtons = document.querySelectorAll('.tab-button');
+            tabButtons.forEach(button => button.classList.remove('active')); // Remove active class from all buttons
+            const dataTabButton = Array.from(tabButtons).find(button => button.dataset.tab === 'data');
+            if (dataTabButton) {
+                dataTabButton.classList.add('active'); // Set data tab button as active
+            }
             tabButtons.forEach(button => {
                 button.addEventListener('click', () => {
                     tabButtons.forEach(btn => btn.classList.remove('active'));
@@ -813,21 +842,24 @@ in (select mbr from issues)</textarea>
                     }
                 });
             });
+
+            hideSpinner();
         }
 
         // Fetch related issues
-        function fetchRelatedIssues(lib, mbr, container) {
+        function fetchRelatedIssues(mbr, container) {
             const query = `
                 SELECT ISSUE, RELOBJ, RELTYPE
                 FROM issues
-                WHERE LIB = ? AND MBR = ?
+                WHERE MBR = ?
             `;
+
 
             try {
                 log('Executing related issues query:', query);
-                log('Parameters:', lib, mbr);
+                log('Parameters:', mbr);
                 const stmt = db.prepare(query);
-                stmt.bind([lib, mbr]);
+                stmt.bind([mbr]);
                 const results = [];
                 while (stmt.step()) {
                     results.push(stmt.get());
