@@ -85,7 +85,7 @@
             display: none;
         }
 
-        .file-input-label {
+        .button {
             background-color: var(--ubs-red);
             color: var(--ubs-white);
             border: none;
@@ -96,7 +96,7 @@
             transition: background-color 0.3s, transform 0.2s;
         }
 
-        .file-input-label:hover {
+        .button:hover {
             background-color: #D10014;
         }
 
@@ -120,22 +120,6 @@
             box-sizing: border-box;
             background-color: var(--background-color);
             color: var(--text-color);
-        }
-
-        #runQuery {
-            background-color: var(--ubs-red);
-            color: var(--ubs-white);
-            border: none;
-            padding: 10px 20px;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 16px;
-            border-radius: 10px;
-            transition: background-color 0.3s, transform 0.2s;
-        }
-
-        #runQuery:hover {
-            background-color: #D10014;
         }
 
         #filteredResultsArea {
@@ -368,7 +352,7 @@
     <div class="container">
         <div class="header">
             <div class="file-inputs">
-                <label for="loadSREF" class="file-input-label">Load Ref Analysis</label>
+                <label for="loadSREF" class="button">Load Ref Analysis</label>
                 <input type="file" id="loadSREF" accept=".tsv,.txt">
             </div>
 
@@ -388,7 +372,7 @@
 in (select mbr from issues
        where relobj='FDBCLI' or reltype like '%file%' or issue like '%someproblem%')">select * from sref where (mbr) 
 in (select mbr from issues) limit 100</textarea>
-                <button id="runQuery">Run Query <span style="font-size: 0.8em;">^⏎</span></button>
+                <button id="runQuery" class="button">Run Query <span style="font-size: 0.8em;">^⏎</span></button>
             </div>
             <div id="filteredResultsArea"></div>
         </div>
@@ -411,7 +395,6 @@ in (select mbr from issues) limit 100</textarea>
     <script type="text/javascript" src="https://unpkg.com/sql-formatter-plus@latest/dist/sql-formatter.min.js"></script>
     <script>
         let db;
-        let headers = [];
         let srefHeaders = [];
 
         const isLoggingEnabled = new URLSearchParams(window.location.search).get('log') === '1';
@@ -492,9 +475,7 @@ in (select mbr from issues) limit 100</textarea>
                     const content = e.target.result;
                     const lines = content.split('\n');
 
-                    headers = lines[0].split('\t').map(h => h.trim());
-
-                    if (headers.length !== 7) {
+                    if (lines[0].split('\t').length !== 7) {
                         alert('Error: The file must contain exactly 7 columns.');
                         hideSpinner();
                         return;
