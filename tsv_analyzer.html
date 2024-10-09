@@ -430,8 +430,17 @@ in (select mbr from issues) limit 100</textarea>
 
         function formatSQL() {
             const sqlQueryTextarea = document.getElementById('sqlQuery');
-            const formattedQuery = sqlFormatter.format(sqlQueryTextarea.value);
-            sqlQueryTextarea.value = formattedQuery;
+            const currentQuery = sqlQueryTextarea.value;
+            const formattedQuery = sqlFormatter.format(currentQuery);
+
+            // Check if the current query is the same as the formatted query
+            if (currentQuery === formattedQuery) {
+                // If already formatted, convert to a single line
+                sqlQueryTextarea.value = currentQuery.replace(/\n/g, ' ').replace(/\s+/g, ' ').trim();
+            } else {
+                // Otherwise, format the SQL
+                sqlQueryTextarea.value = formattedQuery;
+            }
             autoResizeTextarea(sqlQueryTextarea);
         }
 
@@ -539,7 +548,7 @@ in (select mbr from issues) limit 100</textarea>
             showSpinner();
 
             const query = document.getElementById('sqlQuery').value;
-            
+
             setTimeout(() => {
                 perfMeasure('Run Query', () => {
                     try {
@@ -859,7 +868,7 @@ in (select mbr from issues) limit 100</textarea>
 
         const sqlQueryTextarea = document.getElementById('sqlQuery');
         sqlQueryTextarea.addEventListener('input', () => autoResizeTextarea(sqlQueryTextarea));
-        
+
         autoResizeTextarea(sqlQueryTextarea);
 
     </script>
