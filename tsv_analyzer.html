@@ -442,18 +442,14 @@ in (select mbr from issues) limit 100</textarea>
             if (queryComments) {
                 queryComments += '\n';
             }
-            console.log("queryComments"); 
-            console.log(queryComments); 
 
             // Remove comments from the current query for formatting
             const currentQuery = originalQuery.split('\n')
                 .filter(line => !line.trim().startsWith('--'))
                 .join('\n');
-            console.log("currentQuery"); 
-            console.log(currentQuery); 
+
             const formattedQuery = sqlFormatter.format(currentQuery, { uppercase: true });
-            console.log("formattedQuery"); 
-            console.log(formattedQuery); 
+
 
             // Check if the current query is the same as the formatted query
             if (currentQuery === formattedQuery) {
@@ -887,9 +883,29 @@ in (select mbr from issues) limit 100</textarea>
         const sqlQueryTextarea = document.getElementById('sqlQuery');
         sqlQueryTextarea.addEventListener('input', () => autoResizeTextarea(sqlQueryTextarea));
 
+        // New event listener for double-click on the SQL query textarea
+        sqlQueryTextarea.addEventListener('dblclick', () => {
+            const fileName = document.querySelector('.logo').textContent.replace('Analyzing ', ''); // Get the file name
+            const filteredRowsCount = document.getElementById('filteredRowsCount').textContent; // Get the filtered rows count
+            const currentQuery = sqlQueryTextarea.value; // Get the current SQL query
+            const formattedQuery = sqlFormatter.format(currentQuery, { uppercase: true }); // Format the SQL query
+            const triptick="```";
+            // Prepare the text to copy
+            const textToCopy = `# File : ${fileName}\n#### ${filteredRowsCount}\n#### SQL :\n${triptick}\n${formattedQuery}\n${triptick}\n\n\n`;
+            
+            // Copy to clipboard
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                console.log('Text copied to clipboard');
+            }).catch(err => {
+                console.error('Failed to copy text: ', err);
+            });
+        });
+
         autoResizeTextarea(sqlQueryTextarea);
 
     </script>
 </body>
 
 </html>
+
+
