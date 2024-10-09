@@ -372,7 +372,8 @@
 in (select mbr from issues
        where relobj='FDBCLI' or reltype like '%file%' or issue like '%someproblem%')">select * from sref where (mbr) 
 in (select mbr from issues) limit 100</textarea>
-                <button id="runQuery" class="button">Run Query <span style="font-size: 0.8em;">^⏎</span></button>
+                <button id="runQuery" class="button">Run Query <span style="font-size: 0.8em;">⌃⏎</span></button>
+                <button id="formatSQL" class="button">Format SQL <span style="font-size: 0.8em;">⌥⏎</span></button>
             </div>
             <div id="filteredResultsArea"></div>
         </div>
@@ -427,7 +428,17 @@ in (select mbr from issues) limit 100</textarea>
             log('SQL.js initialized');
         });
 
-        function sanitizeHeader(header) {
+        function formatSQL() {
+            const sqlQueryTextarea = document.getElementById('sqlQuery');
+            const formattedQuery = sqlFormatter.format(sqlQueryTextarea.value);
+            sqlQueryTextarea.value = formattedQuery;
+            autoResizeTextarea(sqlQueryTextarea);
+        }
+
+        // Event listener for Format SQL button
+        document.getElementById('formatSQL').addEventListener('click', formatSQL);
+
+        function xxxxxsanitizeHeader(header) {
             return header.trim().replace(/[^a-zA-Z0-9_]/g, '_');
         }
 
@@ -528,11 +539,6 @@ in (select mbr from issues) limit 100</textarea>
             showSpinner();
 
             const query = document.getElementById('sqlQuery').value;
-            const formattedQuery = sqlFormatter.format(query);
-
-            const sqlQueryTextarea = document.getElementById('sqlQuery');
-            sqlQueryTextarea.value = formattedQuery;
-            autoResizeTextarea(sqlQueryTextarea);
             
             setTimeout(() => {
                 perfMeasure('Run Query', () => {
@@ -779,6 +785,10 @@ in (select mbr from issues) limit 100</textarea>
         document.getElementById('sqlQuery').addEventListener('keydown', (event) => {
             if ((event.ctrlKey || event.metaKey || event.keyCode === 17) && event.key === 'Enter') {
                 runQuery();
+            }
+            // New event listener for Alt + Enter
+            if (event.altKey && event.key === 'Enter') {
+                formatSQL(); // Call formatSQL function
             }
         });
 
