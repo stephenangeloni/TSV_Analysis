@@ -430,16 +430,38 @@ in (select mbr from issues) limit 100</textarea>
 
         function formatSQL() {
             const sqlQueryTextarea = document.getElementById('sqlQuery');
-            const currentQuery = sqlQueryTextarea.value;
+            const originalQuery = sqlQueryTextarea.value;
+            // Get all lines that start with -- when trimmed
+            queryComments = originalQuery.split('\n')
+                .filter(line => line.trim().startsWith('--'))
+                .map(line => {
+                    const trimmedLine = line.trim();
+                    return trimmedLine.startsWith('-- ') ? trimmedLine : trimmedLine.replace('--', '-- '); 
+                }) 
+                .join('\n');
+            if (queryComments) {
+                queryComments += '\n';
+            }
+            console.log("queryComments"); 
+            console.log(queryComments); 
+
+            // Remove comments from the current query for formatting
+            const currentQuery = originalQuery.split('\n')
+                .filter(line => !line.trim().startsWith('--'))
+                .join('\n');
+            console.log("currentQuery"); 
+            console.log(currentQuery); 
             const formattedQuery = sqlFormatter.format(currentQuery, { uppercase: true });
+            console.log("formattedQuery"); 
+            console.log(formattedQuery); 
 
             // Check if the current query is the same as the formatted query
             if (currentQuery === formattedQuery) {
                 // If already formatted, convert to a single line
-                sqlQueryTextarea.value = currentQuery.replace(/\n/g, ' ').replace(/\s+/g, ' ').trim();
+                sqlQueryTextarea.value = queryComments + currentQuery.replace(/\n/g, ' ').replace(/\s+/g, ' ').trim();
             } else {
                 // Otherwise, format the SQL
-                sqlQueryTextarea.value = formattedQuery;
+                sqlQueryTextarea.value = queryComments + formattedQuery;
             }
             autoResizeTextarea(sqlQueryTextarea);
         }
