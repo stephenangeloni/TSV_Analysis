@@ -374,7 +374,7 @@
                 <textarea id="sqlQuery" placeholder="select * from sref where (mbr) 
 in (select mbr from issues
        where relobj='FDBCLI' or reltype like '%file%' or issue like '%someproblem%')">select * from sref where (mbr) 
-in (select mbr from issues) limit 100</textarea>
+in (select mbr from issues)</textarea>
                 <button id="runQuery" class="button">Run Query ⌃⏎</button>
                 <button id="formatSQL" class="button">Format SQL ⌥⏎</button>
             </div>
@@ -634,7 +634,7 @@ in (select mbr from issues) limit 100</textarea>
             tableHTML += '</tr></thead>';
 
             tableHTML += '<tbody>';
-            const rowsToDisplay = Math.min(results[0].values.length, 50000);
+            const rowsToDisplay = Math.min(results[0].values.length, 25000);
             for (let i = 0; i < rowsToDisplay; i++) {
                 const row = results[0].values[i];
                 tableHTML += '<tr>';
