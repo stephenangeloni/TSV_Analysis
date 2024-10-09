@@ -12,17 +12,11 @@
             --ubs-light-gray: #F5F5F5;
             --ubs-white: #FFFFFF;
             --background-color: #F0F4F8;
-            /* Softer light background */
             --text-color: #333333;
-            /* Darker text for better readability */
             --header-background: #FFFFFF;
-            /* Light header */
             --content-background: #FFFFFF;
-            /* Light content background */
             --table-even-row: #E9E9E9;
-            /* Softer even row color */
             --modal-background: rgba(0, 0, 0, 0.8);
-            /* Darker modal background */
             --code-background: #f4f4f4;
             --code-text: #333;
             --toggle-background: #ccc;
@@ -31,17 +25,11 @@
 
         body.dark-mode {
             --background-color: #1E1E1E;
-            /* Darker background for dark mode */
             --text-color: #E0E0E0;
-            /* Lighter text for dark mode */
             --header-background: #2C2C2C;
-            /* Dark header */
             --content-background: #2C2C2C;
-            /* Dark content background */
             --table-even-row: #3A3A3A;
-            /* Darker even row color */
             --modal-background: rgba(255, 255, 255, 0.1);
-            /* Softer modal background */
             --code-background: #2d2d2d;
             --code-text: #e0e0e0;
             --toggle-background: #444444;
@@ -54,9 +42,7 @@
             margin: 0;
             padding: 0;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            /* Modern font */
             line-height: 1.6;
-            /* Increased line height for better readability */
             background-color: var(--background-color);
             color: var(--text-color);
         }
@@ -65,11 +51,8 @@
             display: flex;
             flex-direction: column;
             height: 100vh;
-            /* Set height to 100% of the viewport height */
             border-radius: 8px;
-            /* Rounded corners for the container */
             overflow: hidden;
-            /* Prevent overflow */
         }
 
         .header {
@@ -77,34 +60,25 @@
             color: var(--text-color);
             padding: 20px;
             display: flex;
-            /* Use flexbox for the header */
             align-items: center;
-            /* Center items vertically */
             justify-content: space-between;
-            /* Space between items */
             position: relative;
-            /* Position relative for absolute centering */
         }
 
         .logo-container {
             position: absolute;
-            /* Position absolute to center the logo */
             left: 50%;
-            /* Move to the center */
             transform: translateX(-50%);
-            /* Adjust to center */
         }
 
         .content {
             flex: 1;
-            /* Allow content to grow and fill available space */
             padding: 20px;
             background-color: var(--content-background);
             width: calc(100% - 40px);
             box-sizing: border-box;
             margin: 0 auto;
             overflow-y: auto;
-            /* Enable vertical scrolling */
         }
 
         #loadSREF {
@@ -113,25 +87,17 @@
 
         .file-input-label {
             background-color: var(--ubs-red);
-            /* Change background color to match Run Query */
             color: var(--ubs-white);
-            /* Change text color to match Run Query */
             border: none;
-            /* Remove border */
             padding: 10px 20px;
-            /* Match padding of Run Query */
             cursor: pointer;
             font-weight: bold;
-            /* Make text bold */
             border-radius: 10px;
-            /* Rounded corners */
             transition: background-color 0.3s, transform 0.2s;
-            /* Add transition for hover effect */
         }
 
         .file-input-label:hover {
             background-color: #D10014;
-            /* Change hover color to match Run Query */
         }
 
         #filteredRowsCount {
@@ -165,14 +131,11 @@
             font-weight: bold;
             font-size: 16px;
             border-radius: 10px;
-            /* Rounded corners */
             transition: background-color 0.3s, transform 0.2s;
-            /* Added transform for hover effect */
         }
 
         #runQuery:hover {
             background-color: #D10014;
-            /* Slightly enlarge on hover */
         }
 
         #filteredResultsArea {
@@ -180,38 +143,29 @@
             border: 1px solid var(--text-color);
             padding: 20px;
             overflow-y: auto;
-            /* Enable vertical scrolling */
             flex: 1;
-            /* Allow filtered results area to grow and fill available space */
         }
 
         .table-container {
             overflow-x: auto;
             flex: 1;
-            /* Allow the table container to grow and fill available space */
             border-radius: 8px;
-            /* Rounded corners */
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            /* Subtle shadow */
         }
 
         table {
             width: 100%;
             font-size: 14px;
             line-height: 1.4;
-            /* Increased line height for better readability */
             border-spacing: 0;
             border-collapse: separate;
             border-radius: 8px;
-            /* Rounded corners */
             overflow: hidden;
-            /* Prevent overflow */
         }
 
         th,
         td {
             padding: 12px;
-            /* Increased padding for better spacing */
             text-align: left;
             border-bottom: 1px solid var(--text-color);
         }
@@ -260,11 +214,8 @@
             left: 50%;
             transform: translate(-50%, -50%);
             border-radius: 8px;
-            /* Rounded corners for modal */
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-            /* Subtle shadow */
             overflow-y: auto;
-            /* Enable vertical scrolling in modal */
         }
 
         .close {
@@ -274,7 +225,6 @@
             font-weight: bold;
             cursor: pointer;
             transition: color 0.3s;
-            /* Smooth color transition */
         }
 
         .close:hover,
@@ -349,7 +299,6 @@
             transform: translateX(26px);
         }
 
-        /* Spinner styles */
         .spinner {
             position: fixed;
             left: 50%;
@@ -357,13 +306,10 @@
             width: 50px;
             height: 50px;
             border: 5px solid #f3f3f3;
-            /* Light grey */
             border-top: 5px solid var(--ubs-red);
-            /* Red */
             border-radius: 50%;
             animation: spin 1s linear infinite;
             z-index: 2000;
-            /* Ensure it's above other elements */
             transform: translate(-50%, -50%);
         }
 
@@ -379,61 +325,41 @@
 
         .file-inputs {
             display: flex;
-            /* Use flexbox for the file inputs */
             align-items: center;
-            /* Center items vertically */
             margin-right: auto;
-            /* Push the logo and dark mode toggle to the right */
         }
 
         .logo {
             font-size: 32px;
-            /* Increase font size */
             font-weight: bold;
-            /* Make the text bold */
             text-align: center;
-            /* Center the text */
         }
 
         .tab-bar {
             display: flex;
             border-bottom: 2px solid var(--ubs-red);
-            /* Add a bottom border for the tab bar */
         }
 
         .tab-button {
             flex: 1;
-            /* Make buttons take equal space */
             padding: 10px;
-            /* Add padding for better touch targets */
             text-align: center;
-            /* Center the text */
             background-color: var(--background-color);
-            /* Default background */
             border: none;
-            /* Remove default border */
             cursor: pointer;
-            /* Pointer cursor on hover */
             transition: background-color 0.3s, color 0.3s;
-            /* Smooth transition */
             font-weight: bold;
-            /* Make text bold */
             color: var(--text-color);
-            /* Default text color */
         }
 
         body.dark-mode .tab-button {
             color: var(--ubs-white);
-            /* Change text color to white in dark mode */
         }
 
         .tab-button.active {
             background-color: var(--ubs-red);
-            /* Active tab background */
             color: var(--ubs-white);
-            /* Active tab text color */
             border-radius: 5px 5px 0 0;
-            /* Rounded corners on top */
         }
     </style>
 </head>
@@ -480,38 +406,32 @@ in (select mbr from issues) limit 100</textarea>
             <div id="modalContent"></div>
         </div>
     </div>
-    <div id="spinner" class="spinner" style="display: none;"></div> <!-- Added spinner -->
+    <div id="spinner" class="spinner" style="display: none;"></div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js"></script>
     <script type="text/javascript" src="https://unpkg.com/sql-formatter-plus@latest/dist/sql-formatter.min.js"></script>
     <script>
-        // Global variables
         let db;
         let headers = [];
         let srefHeaders = [];
 
-        // Check if logging is enabled
         const isLoggingEnabled = new URLSearchParams(window.location.search).get('log') === '1';
 
-        // Logging function
         function log(...args) {
             if (isLoggingEnabled) {
                 console.log(`${getTimestamp()} -`, ...args);
             }
         }
 
-        // Error logging function
         function logError(...args) {
             if (isLoggingEnabled) {
                 console.error(`${getTimestamp()} -`, ...args);
             }
         }
 
-        // Timestamp function for logging
         function getTimestamp() {
             return new Date().toISOString();
         }
 
-        // Performance measurement
         const perfMeasure = (name, fn) => {
             const start = performance.now();
             fn();
@@ -519,18 +439,15 @@ in (select mbr from issues) limit 100</textarea>
             log(`${name} took ${end - start} milliseconds.`);
         };
 
-        // Initialize SQL.js
         initSqlJs({ locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${file}` }).then(SQL => {
             db = new SQL.Database();
             log('SQL.js initialized');
         });
 
-        // Sanitize header for SQLite column name
         function sanitizeHeader(header) {
             return header.trim().replace(/[^a-zA-Z0-9_]/g, '_');
         }
 
-        // Check if a row is valid (all columns except the last one are not empty)
         function isValidRow(row) {
             for (let i = 0; i < row.length - 1; i++) {
                 if (row[i].trim() === '') {
@@ -540,36 +457,29 @@ in (select mbr from issues) limit 100</textarea>
             return true;
         }
 
-        // Show spinner
         function showSpinner() {
             document.getElementById('spinner').style.display = 'block';
         }
 
-        // Hide spinner
         function hideSpinner() {
             document.getElementById('spinner').style.display = 'none';
         }
 
-        // Modify file input event listener
         document.getElementById('loadSREF').addEventListener('change', (event) => {
-            showSpinner(); // Show spinner when file is loading
+            showSpinner();
             const file = event.target.files[0];
-            document.querySelector('.logo').textContent = 'Analyzer'; // Reset header to Analyzer
+            document.querySelector('.logo').textContent = 'Analyzer';
 
-            // Clear existing table before loading new data
-            db.run("DROP TABLE IF EXISTS sref"); // Drop the existing table
-            db.run("DROP TABLE IF EXISTS issues"); // Drop the existing table
+            db.run("DROP TABLE IF EXISTS sref");
+            db.run("DROP TABLE IF EXISTS issues");
 
-            // Rename headers to match the required names
             srefHeaders = ['LIB', 'FIL', 'MBR', 'TYP', 'SEQ', 'DATE', 'DATA'];
 
             const createTableSQL = `CREATE TABLE sref (${srefHeaders.map(h => `"${h}" TEXT`).join(', ')})`;
             db.run(createTableSQL);
 
-            // Define headers for the issues table
             const issuesHeaders = ['LIB', 'MBR', 'ISSUE', 'RELOBJ', 'RELTYPE'];
 
-            // Create issues table
             const createIssuesTableSQL = `CREATE TABLE issues (${issuesHeaders.map(h => `"${h}" TEXT`).join(', ')})`;
             db.run(createIssuesTableSQL);
 
@@ -584,14 +494,12 @@ in (select mbr from issues) limit 100</textarea>
 
                     headers = lines[0].split('\t').map(h => h.trim());
 
-                    // Validate the number of columns
                     if (headers.length !== 7) {
                         alert('Error: The file must contain exactly 7 columns.');
-                        hideSpinner(); // Hide spinner if there's an error
-                        return; // Exit the function if validation fails
+                        hideSpinner();
+                        return;
                     }
 
-                    // Set header to "Analyzing [filename]" after loading data
                     document.querySelector('.logo').textContent = `Analyzing ${file.name}`;
 
                     const stmt = db.prepare(`INSERT INTO sref VALUES (${srefHeaders.map(() => '?').join(', ')})`);
@@ -615,20 +523,16 @@ in (select mbr from issues) limit 100</textarea>
                     db.run('COMMIT');
                     stmt.free();
 
-                    //db.run('BEGIN TRANSACTION');
                     db.run("INSERT INTO ISSUES (LIB, MBR, ISSUE, RELOBJ, RELTYPE) SELECT LIB, FIL, MBR, TYP, DATA FROM SREF WHERE SEQ = '0';");
                     db.run("DELETE FROM SREF WHERE SEQ = '0';");
-                    //db.run('COMMIT');
 
-                    // Log database structure if logging is enabled
                     if (isLoggingEnabled) {
                         log('Database structure:', db.exec("SELECT sql FROM sqlite_master WHERE type='table'").map(row => row.values[0]).join('\n'));
                     }
                 });
 
-                // Display initial results
                 runQuery();
-                hideSpinner(); // Hide spinner after file is loaded
+                hideSpinner();
             };
 
             reader.onerror = (error) => {
@@ -637,12 +541,10 @@ in (select mbr from issues) limit 100</textarea>
             };
         });
 
-        // Run SQL query
         function runQuery() {
-            // Clear previous results and show loading message
-            document.getElementById('filteredResultsArea').innerHTML = ''; // Clear previous results
-            document.getElementById('filteredRowsCount').textContent = 'Loading...'; // Show loading message
-            showSpinner(); // Show spinner when running query
+            document.getElementById('filteredResultsArea').innerHTML = '';
+            document.getElementById('filteredRowsCount').textContent = 'Loading...';
+            showSpinner();
 
             const query = document.getElementById('sqlQuery').value;
             const formattedQuery = sqlFormatter.format(query);
@@ -651,17 +553,15 @@ in (select mbr from issues) limit 100</textarea>
             sqlQueryTextarea.value = formattedQuery;
             autoResizeTextarea(sqlQueryTextarea);
             
-            // Use setTimeout to allow DOM updates to render
             setTimeout(() => {
                 perfMeasure('Run Query', () => {
                     try {
                         log(`Executing query: ${query}`);
                         const stmt = db.prepare(query);
-                        log(`Statement prepared: ${stmt}`); // Log the statement object
+                        log(`Statement prepared: ${stmt}`);
 
-                        // Get column names immediately after preparing the statement
                         const columnNames = stmt.getColumnNames();
-                        log(`Column Names: ${columnNames.join(', ')}`); // Log column names
+                        log(`Column Names: ${columnNames.join(', ')}`);
 
                         const results = [];
                         while (stmt.step()) {
@@ -670,7 +570,6 @@ in (select mbr from issues) limit 100</textarea>
                         stmt.free();
                         log(`Query executed successfully. Result count: ${results.length}`);
 
-                        // Check if column names are empty
                         if (columnNames.length === 0) {
                             log('No column names returned. Check the table structure.');
                             const schema = db.exec("SELECT sql FROM sqlite_master WHERE type='table'").map(row => row.values[0]).join('\n');
@@ -686,12 +585,11 @@ in (select mbr from issues) limit 100</textarea>
                             log('Error stack:', error.stack);
                         }
                     }
-                    hideSpinner(); // Hide spinner after query execution
+                    hideSpinner();
                 });
-            }, 0); // Delay execution to allow DOM updates
+            }, 0);
         }
 
-        // Display query results
         function displayResults(results) {
             log('Displaying results');
             const filteredResultsArea = document.getElementById('filteredResultsArea');
@@ -704,14 +602,12 @@ in (select mbr from issues) limit 100</textarea>
 
             let tableHTML = '<div class="table-container"><table>';
 
-            // Create header row
             tableHTML += '<thead><tr>';
             ['LIB', 'FIL', 'MBR', 'TYP', 'SEQ', 'DATE', 'DATA'].forEach(column => {
                 tableHTML += `<th>${escapeHTML(column)}</th>`;
             });
             tableHTML += '</tr></thead>';
 
-            // Create data rows (limit to 50,000 rows)
             tableHTML += '<tbody>';
             const rowsToDisplay = Math.min(results[0].values.length, 50000);
             for (let i = 0; i < rowsToDisplay; i++) {
@@ -726,22 +622,18 @@ in (select mbr from issues) limit 100</textarea>
 
             tableHTML += '</table></div>';
 
-            // Set the innerHTML once
             filteredResultsArea.innerHTML = tableHTML;
 
-            // Update filtered rows count
             const totalRows = results[0].values.length;
             const displayedRows = rowsToDisplay;
             document.getElementById('filteredRowsCount').textContent =
                 `Displaying ${displayedRows} of ${totalRows} filtered rows`;
             log(`Displayed ${displayedRows} of ${totalRows} filtered rows`);
 
-            // Add click event listeners to table rows
             const table = filteredResultsArea.querySelector('table');
             table.addEventListener('click', handleRowClick);
         }
 
-        // Handle row click
         function handleRowClick(event) {
             const row = event.target.closest('tr');
             if (!row) return;
@@ -780,27 +672,22 @@ in (select mbr from issues) limit 100</textarea>
             }
         }
 
-        // Display modal with matching data and related issues
         function displayModal(results, modalHeaderColumns, clickedValue) {
-
             showSpinner();
             log('Displaying modal for:', modalHeaderColumns.join(' | '));
             const modalHeader = document.getElementById('modalHeader');
             const modalContent = document.getElementById('modalContent');
             const modal = document.getElementById('myModal');
 
-            // Set the header text
             modalHeader.textContent = modalHeaderColumns.join(' | ');
 
-            // Create content divs for data and issues
             const dataContent = document.createElement('div');
             dataContent.id = 'dataContent';
-            dataContent.className = 'tab-content active'; // Initially active
+            dataContent.className = 'tab-content active';
             const issuesContent = document.createElement('div');
             issuesContent.id = 'issuesContent';
-            issuesContent.className = 'tab-content'; // Initially inactive
+            issuesContent.className = 'tab-content';
 
-            // Remove existing content if it exists
             const existingDataContent = modalContent.querySelector('#dataContent');
             const existingIssuesContent = modalContent.querySelector('#issuesContent');
 
@@ -811,7 +698,6 @@ in (select mbr from issues) limit 100</textarea>
                 modalContent.removeChild(existingIssuesContent);
             }
 
-            // Append new content
             modalContent.appendChild(dataContent);
             modalContent.appendChild(issuesContent);
 
@@ -831,33 +717,30 @@ in (select mbr from issues) limit 100</textarea>
                 log(`Modal content set with ${results[0].values.length} rows`);
             }
 
-            // Fetch and display related issues
             const lib = modalHeaderColumns[0];
             const mbr = modalHeaderColumns[2];
             fetchRelatedIssues(mbr, issuesContent);
 
             modal.style.display = 'block';
 
-
-            // Add event listeners for tab buttons
             const tabButtons = document.querySelectorAll('.tab-button');
-            tabButtons.forEach(button => button.classList.remove('active')); // Remove active class from all buttons
+            tabButtons.forEach(button => button.classList.remove('active'));
             const dataTabButton = Array.from(tabButtons).find(button => button.dataset.tab === 'data');
             if (dataTabButton) {
-                dataTabButton.classList.add('active'); // Set data tab button as active
+                dataTabButton.classList.add('active');
             }
-            dataContent.style.display = 'block'; // Show data content
-            issuesContent.style.display = 'none'; // Hide issues content
+            dataContent.style.display = 'block';
+            issuesContent.style.display = 'none';
             tabButtons.forEach(button => {
                 button.addEventListener('click', () => {
                     tabButtons.forEach(btn => btn.classList.remove('active'));
                     button.classList.add('active');
                     if (button.dataset.tab === 'data') {
-                        dataContent.style.display = 'block'; // Show data content
-                        issuesContent.style.display = 'none'; // Hide issues content
+                        dataContent.style.display = 'block';
+                        issuesContent.style.display = 'none';
                     } else {
-                        dataContent.style.display = 'none'; // Hide data content
-                        issuesContent.style.display = 'block'; // Show issues content
+                        dataContent.style.display = 'none';
+                        issuesContent.style.display = 'block';
                     }
                 });
             });
@@ -865,14 +748,12 @@ in (select mbr from issues) limit 100</textarea>
             hideSpinner();
         }
 
-        // Fetch related issues
         function fetchRelatedIssues(mbr, container) {
             const query = `
                 SELECT ISSUE, RELOBJ, RELTYPE
                 FROM issues
                 WHERE MBR = ?
             `;
-
 
             try {
                 log('Executing related issues query:', query);
@@ -886,7 +767,6 @@ in (select mbr from issues) limit 100</textarea>
                 stmt.free();
                 log(`Related issues query executed successfully. Result count: ${results.length}`);
 
-                // Display related issues
                 if (results.length === 0) {
                     container.textContent = 'No related issues found.';
                 } else {
@@ -903,7 +783,6 @@ in (select mbr from issues) limit 100</textarea>
             }
         }
 
-        // Helper function to escape HTML special characters
         function escapeHTML(unsafe) {
             return unsafe
                 .replace(/&/g, "&amp;")
@@ -913,24 +792,20 @@ in (select mbr from issues) limit 100</textarea>
                 .replace(/'/g, "&#039;");
         }
 
-        // Add event listener for the Run Query button
         document.getElementById('runQuery').addEventListener('click', runQuery);
 
-        // Add event listener for the SQL query textarea
         document.getElementById('sqlQuery').addEventListener('keydown', (event) => {
             if ((event.ctrlKey || event.metaKey || event.keyCode === 17) && event.key === 'Enter') {
-                runQuery(); // Execute the query when Command/Ctrl + Enter is pressed
+                runQuery();
             }
         });
 
-        // Dark mode toggle
         const darkModeToggle = document.getElementById('darkModeToggle');
         darkModeToggle.addEventListener('change', () => {
             document.body.classList.toggle('dark-mode');
             log('Dark mode toggled');
         });
 
-        // Modal close functionality
         const modal = document.getElementById('myModal');
         const span = document.getElementsByClassName('close')[0];
 
@@ -946,9 +821,7 @@ in (select mbr from issues) limit 100</textarea>
             }
         }
 
-
         document.addEventListener('keydown', (event) => {
-
             if (event.key === 'Escape' && modal.style.display === 'block') {
                 modal.style.display = 'none';
                 log('Modal closed by Escape key');
@@ -957,19 +830,16 @@ in (select mbr from issues) limit 100</textarea>
 
             const contentDiv = document.querySelector('.content');
 
-
-            // Page Up / Page Down: Scroll by page
             if (event.key === 'PageUp') {
-                event.preventDefault(); // Prevent default scrolling
+                event.preventDefault();
                 contentDiv.scrollBy({ top: -contentDiv.clientHeight });
             } else if (event.key === 'PageDown') {
-                event.preventDefault(); // Prevent default scrolling
+                event.preventDefault();
                 contentDiv.scrollBy({ top: contentDiv.clientHeight });
             }
 
-            // Command (or Ctrl) + Up / Down: Go to top or bottom
             if ((event.metaKey || event.ctrlKey) && (event.key === 'ArrowUp' || event.key === 'ArrowDown')) {
-                event.preventDefault(); // Prevent default scrolling
+                event.preventDefault();
                 if (event.key === 'ArrowUp') {
                     contentDiv.scrollTo({ top: 0, behavior: 'smooth' });
                 } else {
@@ -977,32 +847,27 @@ in (select mbr from issues) limit 100</textarea>
                 }
             }
 
-                        // Ignore keydown events if the target is the sqlQuery textarea
             if (event.target === document.getElementById('sqlQuery')) {
-                return; // Do nothing if the textarea is focused
+                return;
             }
 
-            // Up / Down Arrow: Scroll by line
             if (event.key === 'ArrowUp') {
-                event.preventDefault(); // Prevent default scrolling
-                contentDiv.scrollBy({ top: -20, behavior: 'smooth' }); // Adjust the value for line height
+                event.preventDefault();
+                contentDiv.scrollBy({ top: -20, behavior: 'smooth' });
             } else if (event.key === 'ArrowDown') {
-                event.preventDefault(); // Prevent default scrolling
-                contentDiv.scrollBy({ top: 20, behavior: 'smooth' }); // Adjust the value for line height
+                event.preventDefault();
+                contentDiv.scrollBy({ top: 20, behavior: 'smooth' });
             }
         });
 
-        // Function to auto-resize the textarea
         function autoResizeTextarea(textarea) {
-            textarea.style.height = 'auto'; // Reset height
-            textarea.style.height = `${textarea.scrollHeight}px`; // Set to scroll height
+            textarea.style.height = 'auto';
+            textarea.style.height = `${textarea.scrollHeight}px`;
         }
 
-        // Add event listener for the SQL query textarea
         const sqlQueryTextarea = document.getElementById('sqlQuery');
         sqlQueryTextarea.addEventListener('input', () => autoResizeTextarea(sqlQueryTextarea));
         
-        // Initial resize to fit content
         autoResizeTextarea(sqlQueryTextarea);
 
     </script>
