@@ -925,7 +925,7 @@ in (select mbr from issues)</textarea>
             // Get the original data from the SQL query
             let originalData;
             try {
-                const stmt = db.prepare(`select distinct lib, fil, mbr, typ from (${currentQuery}) limit 10000`);
+                const stmt = db.prepare(`select distinct lib, fil, mbr, typ from (${currentQuery}) order by 1,2,3,4 limit 10000`);
                 originalData = [];
                 while (stmt.step()) {
                     originalData.push(stmt.getAsObject());
