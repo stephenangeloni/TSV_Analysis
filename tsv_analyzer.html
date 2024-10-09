@@ -917,8 +917,40 @@ in (select mbr from issues) limit 100</textarea>
             const currentQuery = sqlQueryTextarea.value; // Get the current SQL query
             const formattedQuery = sqlFormatter.format(currentQuery, { uppercase: true }); // Format the SQL query
             const triptick = "```";
-            // Prepare the text to copy
-            const textToCopy = `# File : ${fileName}\n#### ${filteredRowsCount}\n#### SQL :\n${triptick}\n${formattedQuery}\n${triptick}\n\n\n`;
+
+            // Get the original data from the SQL query
+            let originalData;
+            try {
+                const stmt = db.prepare(`select distinct lib, fil, mbr, typ from (${currentQuery}) limit 10000`);
+                originalData = [];
+                while (stmt.step()) {
+                    originalData.push(stmt.getAsObject());
+                }
+                stmt.free();
+            } catch (error) {
+                console.error('Error executing SQL query:', error);
+                Swal.fire({
+                    text: 'Error retrieving original data. Please check your SQL query.',
+                    icon: 'error',
+                    showConfirmButton: false,
+                    timer: 2000
+                });
+                return;
+            }
+            // Convert originalData to a markdown table
+            const markdownTable = originalData.length > 0 ? 
+                '| ' + Object.keys(originalData[0]).join(' | ') + ' |\n' +
+                '| ' + Object.keys(originalData[0]).map(() => '---').join(' | ') + ' |\n' +
+                originalData.map(row => 
+                    '| ' + Object.values(row).map(value => 
+                        value === null ? '' : String(value).replace(/\|/g, '\\|')
+                    ).join(' | ') + ' |'
+                ).join('\n')
+                : 'No data available';
+            const headers = Object.keys(originalData[0]).join('\t');
+            const rows = originalData.map(row => Object.values(row).join('\t')).join('\n');
+            const tsvData = `${headers}\n${rows}`;
+            const textToCopy = `# File : ${fileName}\n#### ${filteredRowsCount}\n#### SQL :\n${triptick}\n${formattedQuery}\n${triptick}\n\n#### Data:\n${markdownTable}\n\n`;
 
             // Copy to clipboard
             navigator.clipboard.writeText(textToCopy).then(() => {
