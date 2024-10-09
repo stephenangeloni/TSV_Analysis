@@ -903,6 +903,10 @@ in (select mbr from issues)</textarea>
 
         // New event listener for double-click on the SQL query textarea
         sqlQueryTextarea.addEventListener('dblclick', () => {
+            if (sqlQueryTextarea.value.trim() === '') {
+                sqlQueryTextarea.value = "select * from sref where (mbr) in (select mbr from issues where relobj='FDBCLI' or reltype like '%file%' or issue like '%someproblem%')";
+                return;
+            }
             if (!dataGood) {
                 Swal.fire({
                     text: 'Not possible, re-run the query first',
