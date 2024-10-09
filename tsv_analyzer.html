@@ -431,7 +431,7 @@ in (select mbr from issues) limit 100</textarea>
         function formatSQL() {
             const sqlQueryTextarea = document.getElementById('sqlQuery');
             const currentQuery = sqlQueryTextarea.value;
-            const formattedQuery = sqlFormatter.format(currentQuery);
+            const formattedQuery = sqlFormatter.format(currentQuery,{uppercase: true});
 
             // Check if the current query is the same as the formatted query
             if (currentQuery === formattedQuery) {
@@ -446,10 +446,6 @@ in (select mbr from issues) limit 100</textarea>
 
         // Event listener for Format SQL button
         document.getElementById('formatSQL').addEventListener('click', formatSQL);
-
-        function xxxxxsanitizeHeader(header) {
-            return header.trim().replace(/[^a-zA-Z0-9_]/g, '_');
-        }
 
         function isValidRow(row) {
             for (let i = 0; i < row.length - 1; i++) {
