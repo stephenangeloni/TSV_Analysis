@@ -608,7 +608,9 @@ in (select mbr from issues) limit 100</textarea>
             const totalRows = results[0].values.length;
             const displayedRows = rowsToDisplay;
             document.getElementById('filteredRowsCount').textContent =
-                `Displaying ${displayedRows} of ${totalRows} filtered rows`;
+                displayedRows === totalRows
+                    ? `Displaying ${totalRows} filtered rows`
+                    : `Displaying ${displayedRows} of ${totalRows} filtered rows`;
             log(`Displayed ${displayedRows} of ${totalRows} filtered rows`);
 
             const table = filteredResultsArea.querySelector('table');
