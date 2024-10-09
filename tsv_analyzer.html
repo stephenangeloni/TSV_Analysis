@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<head> 
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="An advanced tool for analyzing TSV files with SQL-like queries.">
+    <meta name="author" content="Your Name Here">
     <title>Advanced TSV File Analyzer</title>
     <style>
         :root {
@@ -41,7 +43,8 @@
             height: 100%;
             margin: 0;
             padding: 0;
-            font-family: 'Helvetica', 'Arial', sans-serif; /* Updated font */
+            font-family: 'Helvetica', 'Arial', sans-serif;
+            /* Updated font */
             line-height: 1.6;
             background-color: var(--background-color);
             color: var(--text-color);
@@ -392,9 +395,18 @@ in (select mbr from issues) limit 100</textarea>
         </div>
     </div>
     <div id="spinner" class="spinner" style="display: none;"></div>
+    <div id="customAlert" style="display: none;">
+        <h2 id="alertHeading">Custom Heading</h2>
+        <p id="alertMessage"></p>
+        <button onclick="closeAlert()">OK</button>
+    </div>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js"></script>
     <script type="text/javascript" src="https://unpkg.com/sql-formatter-plus@latest/dist/sql-formatter.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
+        let dataGood = false;
+        let dataGoodSQL = '';
         let db;
         let srefHeaders = [];
 
@@ -436,8 +448,8 @@ in (select mbr from issues) limit 100</textarea>
                 .filter(line => line.trim().startsWith('--'))
                 .map(line => {
                     const trimmedLine = line.trim();
-                    return trimmedLine.startsWith('-- ') ? trimmedLine : trimmedLine.replace('--', '-- '); 
-                }) 
+                    return trimmedLine.startsWith('-- ') ? trimmedLine : trimmedLine.replace('--', '-- ');
+                })
                 .join('\n');
             if (queryComments) {
                 queryComments += '\n';
@@ -587,6 +599,8 @@ in (select mbr from issues) limit 100</textarea>
                         }
 
                         displayResults([{ columns: columnNames, values: results }]);
+                        dataGood = true;
+                        dataGoodSQL = query;
                     } catch (error) {
                         logError('SQL Error:', error);
                         document.getElementById('filteredResultsArea').innerHTML = `<p>Error: ${error.message}</p>`;
@@ -594,6 +608,7 @@ in (select mbr from issues) limit 100</textarea>
                         if (error.stack) {
                             log('Error stack:', error.stack);
                         }
+                        dataGood = false;
                     }
                     hideSpinner();
                 });
@@ -881,21 +896,39 @@ in (select mbr from issues) limit 100</textarea>
         }
 
         const sqlQueryTextarea = document.getElementById('sqlQuery');
-        sqlQueryTextarea.addEventListener('input', () => autoResizeTextarea(sqlQueryTextarea));
+        sqlQueryTextarea.addEventListener('input', () => {
+            autoResizeTextarea(sqlQueryTextarea);
+            dataGood = false; // Set dataGood to false when the textarea changes
+        });
 
         // New event listener for double-click on the SQL query textarea
         sqlQueryTextarea.addEventListener('dblclick', () => {
+            if (!dataGood) {
+                Swal.fire({
+                    text: 'Not possible, re-run the query first',
+                    icon: 'warning',
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+                return;
+            }
             const fileName = document.querySelector('.logo').textContent.replace('Analyzing ', ''); // Get the file name
             const filteredRowsCount = document.getElementById('filteredRowsCount').textContent; // Get the filtered rows count
             const currentQuery = sqlQueryTextarea.value; // Get the current SQL query
             const formattedQuery = sqlFormatter.format(currentQuery, { uppercase: true }); // Format the SQL query
-            const triptick="```";
+            const triptick = "```";
             // Prepare the text to copy
             const textToCopy = `# File : ${fileName}\n#### ${filteredRowsCount}\n#### SQL :\n${triptick}\n${formattedQuery}\n${triptick}\n\n\n`;
-            
+
             // Copy to clipboard
             navigator.clipboard.writeText(textToCopy).then(() => {
                 console.log('Text copied to clipboard');
+                Swal.fire({
+                    text: 'Copied to the clipboard',
+                    icon: 'success',
+                    showConfirmButton: false,
+                    timer: 1500
+                });
             }).catch(err => {
                 console.error('Failed to copy text: ', err);
             });
@@ -907,5 +940,3 @@ in (select mbr from issues) limit 100</textarea>
 </body>
 
 </html>
-
-
