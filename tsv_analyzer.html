@@ -734,7 +734,7 @@ in (select mbr from issues)</textarea>
                 let contentText = '';
                 results[0].values.forEach((row, index) => {
                     if (row[0] === clickedValue) {
-                        contentText += `<span class="clicked-row">${escapeHTML(row[0])}</span>\n`;
+                        contentText += `<mark>${escapeHTML(row[0])}</mark>\n`;
                     } else {
                         contentText += `${escapeHTML(row[0])}\n`;
                     }
