@@ -944,17 +944,19 @@ in (select mbr from issues)</textarea>
             // Convert originalData to a markdown table
             const markdownTable = originalData.length > 0 ? 
                 '| ' + Object.keys(originalData[0]).join(' | ') + ' |\n' +
-                '| ' + Object.keys(originalData[0]).map(() => '---').join(' | ') + ' |\n' +
+                '| ' + Object.keys(originalData[0]).map(() => ':---------').join(' | ') + ' |\n' +
                 originalData.map(row => 
                     '| ' + Object.values(row).map(value => 
-                        value === null ? '' : String(value).replace(/\|/g, '\\|')
+                        value === null ? '          ' : String(value).replace(/\|/g, '\\|').padEnd(10, ' ')
                     ).join(' | ') + ' |'
                 ).join('\n')
                 : 'No data available';
             const headers = Object.keys(originalData[0]).join('\t');
             const rows = originalData.map(row => Object.values(row).join('\t')).join('\n');
             const tsvData = `${headers}\n${rows}`;
-            const textToCopy = `# File : ${fileName}\n#### ${filteredRowsCount}\n#### SQL :\n${triptick}\n${formattedQuery}\n${triptick}\n\n#### Data:\n${markdownTable}\n\n`;
+            const currentDate = new Date();
+            const formattedDate = `${currentDate.getFullYear()}-${(currentDate.getMonth() + 1).toString().padStart(2, '0')}-${currentDate.getDate().toString().padStart(2, '0')} ${currentDate.getHours().toString().padStart(2, '0')}:${currentDate.getMinutes().toString().padStart(2, '0')}`;
+            const textToCopy = `# ${formattedDate}\n# File : ${fileName}\n#### SQL : ${filteredRowsCount} of source code\n${triptick}\n${formattedQuery}\n${triptick}\n---\n#### Sources:\n${markdownTable}\n\n`;
 
             // Copy to clipboard
             navigator.clipboard.writeText(textToCopy).then(() => {
