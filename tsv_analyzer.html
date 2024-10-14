@@ -405,6 +405,27 @@ in (select mbr from issues)</textarea>
     <script type="text/javascript" src="https://unpkg.com/sql-formatter-plus@latest/dist/sql-formatter.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
+        document.addEventListener('keydown', function(event) {
+            // Check if it's Control+R (Windows/Linux) or Command+R (Mac)
+            if ((event.ctrlKey || event.metaKey) && event.key === 'r') {
+                event.preventDefault(); // Prevent the default browser refresh
+                document.getElementById('runQuery').click(); // Simulate clicking the "Run Query" button
+            }
+        });
+
+        window.addEventListener('beforeunload', function (event) {
+            // Show a confirmation dialog
+            const confirmationMessage = "Are you sure you want to refresh the page? You'll need to reload the database.";
+            event.returnValue = confirmationMessage; // For older browsers
+            return confirmationMessage; // For modern browsers
+        });
+
+        window.addEventListener('unload', function (event) {
+            if (!event.currentTarget.performance.navigation.type === 1) {
+                // If it's not a refresh (type 1), let the default behavior occur
+                return;
+            }
+        });
         let dataGood = false;
         let dataGoodSQL = '';
         let db;
