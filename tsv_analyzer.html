@@ -401,6 +401,10 @@ in (select mbr from issues)</textarea>
         <button onclick="closeAlert()">OK</button>
     </div>
 
+    <div id="customContextMenu" style="display: none; position: absolute; background: white; border: 1px solid #ccc; z-index: 1000;">
+        <div id="copyDefinition" style="padding: 8px; cursor: pointer;">Copy Definition</div>
+    </div>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js"></script>
     <script type="text/javascript" src="https://unpkg.com/sql-formatter-plus@latest/dist/sql-formatter.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -799,7 +803,7 @@ in (select mbr from issues)</textarea>
             const query = `
                 SELECT ISSUE, RELOBJ, RELTYPE
                 FROM issues
-                WHERE MBR = ?
+                WHERE MBR = ? order by RELTYPE, RELOBJ, ISSUE
             `;
 
             try {
@@ -922,8 +926,23 @@ in (select mbr from issues)</textarea>
             dataGood = false; // Set dataGood to false when the textarea changes
         });
 
-        // New event listener for double-click on the SQL query textarea
-        sqlQueryTextarea.addEventListener('dblclick', () => {
+        // New event listener for right-click on the SQL query textarea
+        sqlQueryTextarea.addEventListener('contextmenu', (event) => {
+            event.preventDefault(); // Prevent the default context menu from appearing
+            const contextMenu = document.getElementById('customContextMenu');
+            contextMenu.style.display = 'block';
+            contextMenu.style.left = `${event.pageX}px`;
+            contextMenu.style.top = `${event.pageY}px`;
+        });
+
+        // Hide the custom context menu when clicking elsewhere
+        window.addEventListener('click', () => {
+            const contextMenu = document.getElementById('customContextMenu');
+            contextMenu.style.display = 'none';
+        });
+
+        // Add functionality to the "Copy Definition" menu item
+        document.getElementById('copyDefinition').addEventListener('click', () => {
             if (sqlQueryTextarea.value.trim() === '') {
                 sqlQueryTextarea.value = "select * from sref where (mbr) in (select mbr from issues where relobj='FDBCLI' or reltype like '%file%' or issue like '%someproblem%')";
                 return;
