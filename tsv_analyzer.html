@@ -853,7 +853,7 @@ in (select mbr from issues)</textarea>
                     // Format the issue line and add to issuesText
                     issuesText += formatIssueLine(issueLine) + '\n'; // Concatenate formatted issue line
                 }
-                issuesText = '************************************************************\n* FORTIUS TODO\n' + issuesText + '************************************************************\n';
+                issuesText = '************************************************************\n* FORTIUS TODO\n************************************************************\n' + issuesText + '************************************************************\n';
                 stmt.free();
                 log(`Related issues query executed successfully. Result count: ${results.length}`);
 
