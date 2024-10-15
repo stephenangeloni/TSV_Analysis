@@ -526,6 +526,7 @@ in (select mbr from issues)</textarea>
 
             db.run("DROP TABLE IF EXISTS sref");
             db.run("DROP TABLE IF EXISTS issues");
+            db.run("DROP TABLE IF EXISTS states");
 
             srefHeaders = ['LIB', 'FIL', 'MBR', 'TYP', 'SEQ', 'DATE', 'DATA'];
 
@@ -536,6 +537,11 @@ in (select mbr from issues)</textarea>
 
             const createIssuesTableSQL = `CREATE TABLE issues (${issuesHeaders.map(h => `"${h}" TEXT`).join(', ')})`;
             db.run(createIssuesTableSQL);
+
+            const statesHeaders = ['LIB', 'FIL', 'MBR', 'TYP','PROGRESS'];
+
+            const createStatesTableSQL = `CREATE TABLE states (${statesHeaders.map(h => `"${h}" TEXT`).join(', ')})`;
+            db.run(createStatesTableSQL);
 
             const reader = new FileReader();
 
@@ -575,9 +581,14 @@ in (select mbr from issues)</textarea>
                     db.run('COMMIT');
                     stmt.free();
 
-                    db.run("INSERT INTO ISSUES (LIB, MBR, ISSUE, RELOBJ, RELTYPE) SELECT LIB, FIL, MBR, TYP, DATA FROM SREF WHERE SEQ = '0';");
+                    db.run("INSERT INTO ISSUES (LIB, MBR, ISSUE, RELOBJ, RELTYPE) SELECT LIB, FIL, MBR, TYP, DATA FROM SREF WHERE SEQ = '0' and DATE = '0';");
+                    db.run("DELETE FROM SREF WHERE SEQ = '0' and DATE = '0';");
+
+                    db.run("INSERT INTO STATES (LIB, FIL, MBR, TYP,PROGRESS) SELECT LIB, FIL, MBR, TYP, DATE FROM SREF WHERE SEQ = '0';");
                     db.run("DELETE FROM SREF WHERE SEQ = '0';");
 
+                    db.run("ALTER TABLE SREF ADD COLUMN PROGRESS TEXT DEFAULT '0';");
+                    db.run("UPDATE SREF SET PROGRESS = (select PROGRESS from STATES where STATES.LIB = SREF.LIB and STATES.FIL = SREF.FIL and STATES.MBR = SREF.MBR and STATES.TYP = SREF.TYP) WHERE (LIB,FIL,MBR,TYP) in (select LIB,FIL,MBR,TYP from STATES);");
                     if (isLoggingEnabled) {
                         log('Database structure:', db.exec("SELECT sql FROM sqlite_master WHERE type='table'").map(row => row.values[0]).join('\n'));
                     }
