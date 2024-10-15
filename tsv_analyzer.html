@@ -817,8 +817,11 @@ in (select mbr from issues)</textarea>
                     const row = stmt.get();
                     results.push(row);
                     
-                    // Create the issue line
-                    let issueLine = `${escapeHTML(row[2])} - ${escapeHTML(row[1])} - ${escapeHTML(row[0])}`;
+                    // Clean the row elements to remove control characters
+                    const cleanedRow = row.map(value => value.replace(/[\x00-\x1F\x7F]/g, '').trim());
+
+                    // Create the issue line using cleaned values
+                    let issueLine = `${escapeHTML(cleanedRow[2])} - ${escapeHTML(cleanedRow[1])} - ${escapeHTML(cleanedRow[0])}`;
                     
                     // Function to format the issue line
                     const formatIssueLine = (line) => {
