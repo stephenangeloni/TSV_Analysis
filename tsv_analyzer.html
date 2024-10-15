@@ -847,7 +847,7 @@ in (select mbr from issues)</textarea>
                             line = '          ' + line.substring(breakIndex).trim(); // Add indentation
                         }
                         formattedLines.push(line); // Add the remaining part
-                        return formattedLines.map(l => `* ${l}`).join('\n'); // Prefix with '* '
+                        return formattedLines.map(l => l.startsWith('*') ? l : `* ${l}`).join('\n'); // Prefix with '* ' if not already prefixed
                     };
 
                     // Format the issue line and add to issuesText
