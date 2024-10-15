@@ -812,8 +812,30 @@ in (select mbr from issues)</textarea>
                 const stmt = db.prepare(query);
                 stmt.bind([mbr]);
                 const results = [];
+                let issuesText = ''; // Variable to hold the concatenated issues text
                 while (stmt.step()) {
-                    results.push(stmt.get());
+                    const row = stmt.get();
+                    results.push(row);
+                    
+                    // Create the issue line
+                    let issueLine = `${escapeHTML(row[2])} - ${escapeHTML(row[1])} - ${escapeHTML(row[0])}`;
+                    
+                    // Function to format the issue line
+                    const formatIssueLine = (line) => {
+                        const formattedLines = [];
+                        while (line.length > 60) {
+                            // Split the line at the 60th character
+                            const firstPart = line.substring(0, 60);
+                            formattedLines.push(firstPart);
+                            // Prepare the next part starting from the 10th character
+                            line = '          ' + line.substring(60);
+                        }
+                        formattedLines.push(line); // Add the remaining part
+                        return formattedLines.map(l => `* ${l}`).join('\n'); // Prefix with '* '
+                    };
+
+                    // Format the issue line and add to issuesText
+                    issuesText += formatIssueLine(issueLine) + '\n'; // Concatenate formatted issue line
                 }
                 stmt.free();
                 log(`Related issues query executed successfully. Result count: ${results.length}`);
@@ -827,6 +849,21 @@ in (select mbr from issues)</textarea>
                     });
                     issuesHTML += '</tbody></table>';
                     container.innerHTML = issuesHTML;
+
+                    // Add double-click event to copy issuesText to clipboard
+                    container.addEventListener('dblclick', () => {
+                        navigator.clipboard.writeText(issuesText).then(() => {
+                            log('Issues copied to clipboard');
+                            Swal.fire({
+                                text: 'Issues copied to clipboard',
+                                icon: 'success',
+                                showConfirmButton: false,
+                                timer: 1500
+                            });
+                        }).catch(err => {
+                            console.error('Failed to copy issues text: ', err);
+                        });
+                    });
                 }
             } catch (error) {
                 logError('SQL Error:', error);
