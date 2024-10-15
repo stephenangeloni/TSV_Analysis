@@ -824,11 +824,24 @@ in (select mbr from issues)</textarea>
                     const formatIssueLine = (line) => {
                         const formattedLines = [];
                         while (line.length > 60) {
-                            // Split the line at the 60th character
-                            const firstPart = line.substring(0, 60);
+                            // Try to find the last occurrence of any of the characters in the set ', - .'
+                            let breakIndex = Math.max(
+                                line.lastIndexOf(' ', 60),
+                                line.lastIndexOf(',', 60),
+                                line.lastIndexOf('-', 60),
+                                line.lastIndexOf('.', 60)
+                            );
+
+                            // If no break point is found, default to 60
+                            if (breakIndex === -1) {
+                                breakIndex = 60;
+                            }
+
+                            // Split the line at the found break index
+                            const firstPart = line.substring(0, breakIndex);
                             formattedLines.push(firstPart);
-                            // Prepare the next part starting from the 10th character
-                            line = '          ' + line.substring(60);
+                            // Prepare the next part starting from the break index
+                            line = '          ' + line.substring(breakIndex).trim(); // Add indentation
                         }
                         formattedLines.push(line); // Add the remaining part
                         return formattedLines.map(l => `* ${l}`).join('\n'); // Prefix with '* '
