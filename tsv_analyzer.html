@@ -664,8 +664,12 @@ in (select mbr from issues)</textarea>
             let tableHTML = '<div class="table-container"><table>';
 
             tableHTML += '<thead><tr>';
-            ['LIB', 'FIL', 'MBR', 'TYP', 'SEQ', '   DATE   ', 'DATA'].forEach(column => {
-                tableHTML += `<th>${escapeHTML(column)}</th>`;
+            ['LIB', 'FIL', 'MBR', 'TYP', 'SEQ', 'DATE', 'DATA'].forEach(column => {
+                if (column === 'DATE') {
+                    tableHTML += `<th style="min-width: 100px">${escapeHTML(column)}</th>`;
+                } else {
+                    tableHTML += `<th>${escapeHTML(column)}</th>`;
+                }
             });
             tableHTML += '</tr></thead>';
 
@@ -677,6 +681,8 @@ in (select mbr from issues)</textarea>
                 for (let j = 0; j < 7; j++) {
                     if (j === 2 && row[j] && row[j].length > 17) {
                         tableHTML += `<td><span style="font-size: 0.65em">${escapeHTML(row[j])}</span></td>`;
+                    } else if (j === 5) { // DATE column
+                        tableHTML += `<td style="min-width: 100px">${escapeHTML(row[j])}</td>`;
                     } else {
                         tableHTML += `<td>${escapeHTML(row[j])}</td>`;
                     }
