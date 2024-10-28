@@ -675,7 +675,11 @@ in (select mbr from issues)</textarea>
                 const row = results[0].values[i];
                 tableHTML += '<tr>';
                 for (let j = 0; j < 7; j++) {
-                    tableHTML += `<td>${escapeHTML(row[j])}</td>`;
+                    if (j === 2 && row[j] && row[j].length > 12) {
+                        tableHTML += `<td><span style="font-size: 0.65em">${escapeHTML(row[j])}</span></td>`;
+                    } else {
+                        tableHTML += `<td>${escapeHTML(row[j])}</td>`;
+                    }
                 }
                 tableHTML += '</tr>';
             }
@@ -768,9 +772,9 @@ in (select mbr from issues)</textarea>
                 let contentText = '';
                 results[0].values.forEach((row, index) => {
                     if (row[0].toString().trim() === clickedValue.toString().trim()) {
-                        contentText += `<mark>${escapeHTML(row[0])}</mark>\t${escapeHTML(row[1])}\t${escapeHTML(row[2])}\n`;
+                        contentText += `<mark>${escapeHTML(row[0]).padStart(6)}\t${escapeHTML(row[2]).padStart(10)}\t${escapeHTML(row[1])}</mark>\n`;
                     } else {
-                        contentText += `${escapeHTML(row[0])}\t${escapeHTML(row[1])}\t${escapeHTML(row[2])}\n`;
+                        contentText += `${escapeHTML(row[0]).padStart(6)}\t${escapeHTML(row[2]).padStart(10)}\t${escapeHTML(row[1])}\n`;
                     }
                 });
                 dataContent.innerHTML = contentText;
