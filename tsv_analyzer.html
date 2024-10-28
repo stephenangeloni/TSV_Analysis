@@ -526,9 +526,9 @@ in (select mbr from issues)</textarea>
 
             db.run("DROP TABLE IF EXISTS sref");
             db.run("DROP TABLE IF EXISTS issues");
-            db.run("DROP TABLE IF EXISTS states");
+            //db.run("DROP TABLE IF EXISTS states");
 
-            srefHeaders = ['LIB', 'FIL', 'MBR', 'TYP', 'SEQ', 'DATE', 'DATA'];
+            srefHeaders = ['LIB', 'FIL', 'MBR', 'TYP', 'SEQ', 'DATE', 'DATA', 'LASTUSED', 'TIMESUSED'];
 
             const createTableSQL = `CREATE TABLE sref (${srefHeaders.map(h => `"${h}" TEXT`).join(', ')})`;
             db.run(createTableSQL);
@@ -540,8 +540,8 @@ in (select mbr from issues)</textarea>
 
             const statesHeaders = ['LIB', 'FIL', 'MBR', 'TYP','PROGRESS'];
 
-            const createStatesTableSQL = `CREATE TABLE states (${statesHeaders.map(h => `"${h}" TEXT`).join(', ')})`;
-            db.run(createStatesTableSQL);
+            //const createStatesTableSQL = `CREATE TABLE states (${statesHeaders.map(h => `"${h}" TEXT`).join(', ')})`;
+            //db.run(createStatesTableSQL);
 
             const reader = new FileReader();
 
@@ -552,8 +552,8 @@ in (select mbr from issues)</textarea>
                     const content = e.target.result;
                     const lines = content.split('\n');
 
-                    if (lines[0].split('\t').length !== 7) {
-                        alert('Error: The file must contain exactly 7 columns.');
+                    if (lines[0].split('\t').length !== 9) {
+                        alert('Error: The file must contain exactly 9 columns.');
                         hideSpinner();
                         return;
                     }
@@ -584,8 +584,8 @@ in (select mbr from issues)</textarea>
                     db.run("INSERT INTO ISSUES (LIB, MBR, ISSUE, RELOBJ, RELTYPE) SELECT LIB, FIL, MBR, TYP, DATA FROM SREF WHERE SEQ = '0' and DATE = '0';");
                     db.run("DELETE FROM SREF WHERE SEQ = '0' and DATE = '0';");
 
-                    db.run("INSERT INTO STATES (LIB, FIL, MBR, TYP,PROGRESS) SELECT LIB, FIL, MBR, TYP, DATE FROM SREF WHERE SEQ = '0';");
-                    db.run("DELETE FROM SREF WHERE SEQ = '0';");
+                    //db.run("INSERT INTO STATES (LIB, FIL, MBR, TYP,PROGRESS) SELECT LIB, FIL, MBR, TYP, DATE FROM SREF WHERE SEQ = '0';");
+                    //db.run("DELETE FROM SREF WHERE SEQ = '0';");
 
                     //db.run("ALTER TABLE SREF ADD COLUMN PROGRESS TEXT DEFAULT '0';");
                     //db.run("UPDATE SREF SET PROGRESS = (select PROGRESS from STATES where STATES.LIB = SREF.LIB and STATES.FIL = SREF.FIL and STATES.MBR = SREF.MBR and STATES.TYP = SREF.TYP) WHERE (LIB,FIL,MBR,TYP) in (select LIB,FIL,MBR,TYP from STATES);");
@@ -674,9 +674,9 @@ in (select mbr from issues)</textarea>
             for (let i = 0; i < rowsToDisplay; i++) {
                 const row = results[0].values[i];
                 tableHTML += '<tr>';
-                row.forEach(cell => {
-                    tableHTML += `<td>${escapeHTML(cell)}</td>`;
-                });
+                for (let j = 0; j < 7; j++) {
+                    tableHTML += `<td>${escapeHTML(row[j])}</td>`;
+                }
                 tableHTML += '</tr>';
             }
             tableHTML += '</tbody>';
@@ -705,11 +705,9 @@ in (select mbr from issues)</textarea>
 
             const firstThreeColumns = Array.from(cells).slice(0, 3).map(cell => cell.textContent);
             const modalHeaderColumns = Array.from(cells).slice(0, 4).map(cell => cell.textContent);
-            const lastColumn = srefHeaders[srefHeaders.length - 1];
-
             const query = `
-                SELECT "${lastColumn}"
-                FROM sref
+                SELECT seq, data, date
+                FROM sref 
                 WHERE "${srefHeaders[0]}" = ? AND "${srefHeaders[1]}" = ? AND "${srefHeaders[2]}" = ?
             `;
 
