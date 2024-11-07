@@ -401,7 +401,8 @@ in (select mbr from issues)</textarea>
         <button onclick="closeAlert()">OK</button>
     </div>
 
-    <div id="customContextMenu" style="display: none; position: absolute; background: white; border: 1px solid #ccc; z-index: 1000;">
+    <div id="customContextMenu"
+        style="display: none; position: absolute; background: white; border: 1px solid #ccc; z-index: 1000;">
         <div id="copyDefinition" style="padding: 8px; cursor: pointer;">Copy Definition</div>
     </div>
 
@@ -409,7 +410,7 @@ in (select mbr from issues)</textarea>
     <script type="text/javascript" src="https://unpkg.com/sql-formatter-plus@latest/dist/sql-formatter.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        document.addEventListener('keydown', function(event) {
+        document.addEventListener('keydown', function (event) {
             // Check if it's Control+R (Windows/Linux) or Command+R (Mac)
             if ((event.ctrlKey || event.metaKey) && event.key === 'r') {
                 event.preventDefault(); // Prevent the default browser refresh
@@ -538,7 +539,7 @@ in (select mbr from issues)</textarea>
             const createIssuesTableSQL = `CREATE TABLE issues (${issuesHeaders.map(h => `"${h}" TEXT`).join(', ')})`;
             db.run(createIssuesTableSQL);
 
-            const statesHeaders = ['LIB', 'FIL', 'MBR', 'TYP','PROGRESS'];
+            const statesHeaders = ['LIB', 'FIL', 'MBR', 'TYP', 'PROGRESS'];
 
             //const createStatesTableSQL = `CREATE TABLE states (${statesHeaders.map(h => `"${h}" TEXT`).join(', ')})`;
             //db.run(createStatesTableSQL);
@@ -835,13 +836,13 @@ in (select mbr from issues)</textarea>
                 while (stmt.step()) {
                     const row = stmt.get();
                     results.push(row);
-                    
+
                     // Clean the row elements to remove control characters
                     const cleanedRow = row.map(value => value.replace(/[\x00-\x1F\x7F]/g, '').trim());
 
                     // Create the issue line using cleaned values
                     let issueLine = `${escapeHTML(cleanedRow[2])} - ${escapeHTML(cleanedRow[1])} - ${escapeHTML(cleanedRow[0])}`;
-                    
+
                     // Function to format the issue line
                     const formatIssueLine = (line) => {
                         const formattedLines = [];
@@ -878,7 +879,10 @@ in (select mbr from issues)</textarea>
 
                 if (results.length === 0) {
                     container.textContent = 'No related issues found.';
+                    document.querySelector('.tab-bar').style.display = 'none';
+                    document.getElementById('dataContent').style.display = 'block';
                 } else {
+                    document.querySelector('.tab-bar').style.display = 'flex';
                     let issuesHTML = '<table><thead><tr><th>Issue</th><th>Related Object</th><th>Related Type</th></tr></thead><tbody>';
                     results.forEach(row => {
                         issuesHTML += `<tr><td>${escapeHTML(row[0])}</td><td>${escapeHTML(row[1])}</td><td>${escapeHTML(row[2])}</td></tr>`;
@@ -1055,11 +1059,11 @@ in (select mbr from issues)</textarea>
                 return;
             }
             // Convert originalData to a markdown table
-            const markdownTable = originalData.length > 0 ? 
+            const markdownTable = originalData.length > 0 ?
                 '| ' + Object.keys(originalData[0]).join(' | ') + ' |\n' +
                 '| ' + Object.keys(originalData[0]).map(() => ':---------').join(' | ') + ' |\n' +
-                originalData.map(row => 
-                    '| ' + Object.values(row).map(value => 
+                originalData.map(row =>
+                    '| ' + Object.values(row).map(value =>
                         value === null ? '          ' : String(value).replace(/\|/g, '\\|').padEnd(10, ' ')
                     ).join(' | ') + ' |'
                 ).join('\n')
