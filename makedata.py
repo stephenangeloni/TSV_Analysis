@@ -1,68 +1,79 @@
+# /// script
+# dependencies = [
+#   "lorem",
+# ]
+# ///
 import random
 import itertools
-from operator import itemgetter
+from datetime import datetime, timedelta
+import lorem
 
 # Constants
-MAXCOMBIS = 10000
-VALUES_COL1 = ['MCO']
-VALUES_COL2 = ['QCLSRC', 'QSRC']
-VALUES_LANG = ['RPGLE', 'COBOL', 'CL', 'C', 'CPP', 'JAVA', 'SQL']  
-COMBINATION_LENGTH = 4
-TWO_LETTER_COMBINATIONS = ['AB', 'CD', 'EF', 'GH','12', '34', '56', '78', '90', 'AB', 'CD', 'EF', 'GH', 'IJ', 'KL']
-NUM_LINES = 1000000
+LIBRARIES = ['MCO', 'OTH', 'OLY', 'DEV']
+FILE_TYPES = ['QSRC', 'QCLSRC']
+MEMBER_COUNT = 200
+TYPES = ['RPG', 'COBOL', 'CLP']
+LINES_PER_MEMBER = 20
 
-# Generate all unique combinations of the two-letter combinations
-all_combinations = list(itertools.permutations(TWO_LETTER_COMBINATIONS, COMBINATION_LENGTH))
-all_combinations = [''.join(comb) for comb in all_combinations]
-random.shuffle(all_combinations)
+def generate_random_member_name():
+    """Generate a random uppercase alphanumeric member name of max 10 chars"""
+    length = random.randint(6, 10)
+    chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+    return ''.join(random.choices(chars, k=length))
 
-# Limit to first 10,000 combinations (if there are more)
+def generate_random_date():
+    """Generate a random date in 2024"""
+    start_date = datetime(2024, 1, 1)
+    end_date = datetime(2024, 12, 31)
+    time_between_dates = end_date - start_date
+    days_between_dates = time_between_dates.days
+    random_number_of_days = random.randrange(days_between_dates)
+    random_date = start_date + timedelta(days=random_number_of_days)
+    return random_date.strftime('%Y-%m-%d')
 
-if len(all_combinations) > MAXCOMBIS:
-    all_combinations = all_combinations[:10000]
+# Generate member names and assign types
+members = {}
+for _ in range(MEMBER_COUNT):
+    member_name = generate_random_member_name()
+    while member_name in members:  # Ensure uniqueness
+        member_name = generate_random_member_name()
+    members[member_name] = random.choice(TYPES)
 
 # Generate data
 data = []
-line_count = {}
-lang_val = {}
+for lib in LIBRARIES:
+    for fil in FILE_TYPES:
+        for mbr, typ in members.items():
+            for seq in range(1, LINES_PER_MEMBER + 1):
+                # Generate a random lorem ipsum text limited to 70 chars
+                text_data = lorem.sentence()[:70]
+                
+                row = [
+                    lib,           # LIB
+                    fil,           # FIL
+                    mbr,           # MBR
+                    typ,           # TYP
+                    str(seq),      # SEQ
+                    generate_random_date(),  # DATE
+                    text_data,     # DATA
+                    '-',           # LASTUSED
+                    '0'            # TIMESUSED
+                ]
+                data.append(row)
 
-for i in range(NUM_LINES):
-    col1_value = random.choice(VALUES_COL1)
-    col2_value = random.choice(VALUES_COL2)
-    col3_value = random.choice(all_combinations)
+# Sort the data by LIB, FIL, MBR, SEQ
+sorted_data = sorted(data, key=lambda x: (x[0], x[1], x[2], int(x[4])))
 
-    # Determine n (the numeric column)
-    key = (col1_value, col2_value, col3_value)
-    # If key is not in the dictionary, add it with a value of 1
-    if key not in line_count:
-        line_count[key] = 1
-        lang_val[key] = random.choice(VALUES_LANG)
-    else:
-        line_count[key] += 1
-
-    if line_count[key]<=20000:
-    
-        n_value=line_count[key]
-
-        # Generate metadata column (6 digit number)
-        metadata_value = '{:06d}'.format(random.randint(0, 999999))
-
-        # Generate xyzdata column (random text up to 100 characters)
-        xyzdata_length = random.randint(1, 100)
-        xyzdata_value = ''.join(random.choices('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 ', k=xyzdata_length))
-        lang_value=lang_val[key]
-        data.append((col1_value, col2_value, col3_value, lang_value, n_value, metadata_value, xyzdata_value))
-
-# Sort the data
-sorted_data = sorted(data, key=itemgetter(0, 1, 2, 3, 4, 5))
-
-# Open file to write data
+# Write to file
 with open('test.txt', 'w') as f:
     # Write header
-    f.write("System\tLibrary\tObject\tLang\tSequence\tMetadata\tXYZData\n")
+    headers = ['LIB', 'FIL', 'MBR', 'TYP', 'SEQ', 'DATE', 'DATA', 'LASTUSED', 'TIMESUSED']
+    f.write('\t'.join(headers) + '\n')
     
-    # Write sorted data
+    # Write data
     for row in sorted_data:
         f.write('\t'.join(map(str, row)) + '\n')
 
-print("File generated successfully with {} lines.".format(NUM_LINES + 1))  # +1 for the header
+total_lines = len(sorted_data)
+print(f"File generated successfully with {total_lines + 1} lines.")  # +1 for header
+print(f"Generated {len(members)} unique members across {len(LIBRARIES)} libraries and {len(FILE_TYPES)} file types.")

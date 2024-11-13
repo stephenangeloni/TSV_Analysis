@@ -348,6 +348,41 @@
             color: var(--ubs-white);
             border-radius: 5px 5px 0 0;
         }
+
+        #customContextMenu {
+            background: var(--content-background);
+            border: 1px solid var(--text-color);
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+            border-radius: 4px;
+        }
+
+        #customContextMenu #copyDefinition {
+            color: var(--text-color);
+            padding: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            border-bottom: 1px solid var(--text-color);
+        }
+
+        #customContextMenu #copyDefinition:hover {
+            background-color: var(--table-even-row);
+        }
+
+        #dynamicOptions div {
+            color: var(--text-color);
+            padding: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            border-bottom: 1px solid var(--text-color);
+        }
+
+        #dynamicOptions div:hover {
+            background-color: var(--table-even-row);
+        }
+
+        #dynamicOptions div:last-child {
+            border-bottom: none;
+        }
     </style>
 </head>
 
@@ -401,9 +436,9 @@ in (select mbr from issues)</textarea>
         <button onclick="closeAlert()">OK</button>
     </div>
 
-    <div id="customContextMenu"
-        style="display: none; position: absolute; background: white; border: 1px solid #ccc; z-index: 1000;">
-        <div id="copyDefinition" style="padding: 8px; cursor: pointer;">Copy Definition</div>
+    <div id="customContextMenu" style="display: none; position: absolute; z-index: 1000;">
+        <div id="copyDefinition">Copy Definition</div>
+        <div id="dynamicOptions"></div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js"></script>
@@ -1004,19 +1039,44 @@ in (select mbr from issues)</textarea>
         });
 
         // New event listener for right-click on the SQL query textarea
-        sqlQueryTextarea.addEventListener('contextmenu', (event) => {
-            event.preventDefault(); // Prevent the default context menu from appearing
+        sqlQueryTextarea.addEventListener('contextmenu', async (event) => {
+            event.preventDefault();
             const contextMenu = document.getElementById('customContextMenu');
+            const dynamicOptions = document.getElementById('dynamicOptions');
+            
+            // Clear previous dynamic options
+            dynamicOptions.innerHTML = '';
+            
+            // Only add dynamic options if we have valid data
+            if (dataGood) {
+                try {
+                    // Get distinct libraries from current query
+                    const stmt = db.prepare(`SELECT DISTINCT lib FROM (${dataGoodSQL}) ORDER BY lib`);
+                    while (stmt.step()) {
+                        const lib = stmt.get()[0];
+                        const optionDiv = document.createElement('div');
+                        optionDiv.textContent = `Filter ${lib}`;
+                        optionDiv.addEventListener('click', () => handleLibraryFilter(lib));
+                        dynamicOptions.appendChild(optionDiv);
+                    }
+                    stmt.free();
+                } catch (error) {
+                    console.error('Error getting dynamic options:', error);
+                }
+            }
+
             contextMenu.style.display = 'block';
             contextMenu.style.left = `${event.pageX}px`;
             contextMenu.style.top = `${event.pageY}px`;
         });
 
-        // Hide the custom context menu when clicking elsewhere
-        window.addEventListener('click', () => {
-            const contextMenu = document.getElementById('customContextMenu');
-            contextMenu.style.display = 'none';
-        });
+        // Add the handler function for library filtering
+        function handleLibraryFilter(lib) {
+            const currentQuery = document.getElementById('sqlQuery').value;
+            const newQuery = `SELECT * FROM (${currentQuery}) WHERE lib = '${lib}'`;
+            document.getElementById('sqlQuery').value = newQuery;
+            runQuery();
+        }
 
         // Add functionality to the "Copy Definition" menu item
         document.getElementById('copyDefinition').addEventListener('click', () => {
