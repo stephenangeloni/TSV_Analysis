@@ -298,6 +298,9 @@
             animation: spin 1s linear infinite;
             z-index: 2000;
             transform: translate(-50%, -50%);
+            pointer-events: none;
+            margin: 0;
+            padding: 0;
         }
 
         @keyframes spin {
@@ -383,6 +386,21 @@
         #dynamicOptions div:last-child {
             border-bottom: none;
         }
+
+        .spinner-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.5);
+            z-index: 1999;
+            display: none;
+        }
+
+        body.dark-mode .spinner-overlay {
+            background-color: rgba(0, 0, 0, 0.5);
+        }
     </style>
 </head>
 
@@ -430,6 +448,7 @@ in (select mbr from issues)</textarea>
         </div>
     </div>
     <div id="spinner" class="spinner" style="display: none;"></div>
+    <div id="spinner-overlay" class="spinner-overlay"></div>
     <div id="customAlert" style="display: none;">
         <h2 id="alertHeading">Custom Heading</h2>
         <p id="alertMessage"></p>
@@ -549,10 +568,14 @@ in (select mbr from issues)</textarea>
 
         function showSpinner() {
             document.getElementById('spinner').style.display = 'block';
+            document.getElementById('spinner-overlay').style.display = 'block';
+            // Force browser reflow to ensure spinner is shown
+            document.getElementById('spinner').offsetHeight;
         }
 
         function hideSpinner() {
             document.getElementById('spinner').style.display = 'none';
+            document.getElementById('spinner-overlay').style.display = 'none';
         }
 
         document.getElementById('loadSREF').addEventListener('change', (event) => {
@@ -1038,7 +1061,7 @@ in (select mbr from issues)</textarea>
             dataGood = false; // Set dataGood to false when the textarea changes
         });
 
-        // New event listener for right-click on the SQL query textarea
+        // Update the right-click event listener
         sqlQueryTextarea.addEventListener('contextmenu', async (event) => {
             event.preventDefault();
             const contextMenu = document.getElementById('customContextMenu');
@@ -1050,30 +1073,57 @@ in (select mbr from issues)</textarea>
             // Only add dynamic options if we have valid data
             if (dataGood) {
                 showSpinner();
+                
+                // Add a small delay to ensure spinner is shown
+                await new Promise(resolve => setTimeout(resolve, 50));
+                
                 try {
-                    // Make dynamic Options 
-                    const stmt = db.prepare(
-`WITH lib_limited AS (SELECT DISTINCT substr(lib,1,3) sublib FROM (${dataGoodSQL})),
-lib_cte AS (SELECT DISTINCT lib FROM sref where lib NOT LIKE '%SREF' 
-and substr(lib, 1,3) in (select sublib from lib_limited))
-select * from (SELECT  sublib || ' objects, undo checkout' AS a FROM lib_limited where 0=1
-UNION ALL    
-SELECT lib || ' destination for change' AS a FROM lib_cte s
-UNION ALL
-SELECT lib || ' destination for delete' AS a FROM lib_cte s 
-) as result order by a`);
-                    while (stmt.step()) {
-                        const lib = stmt.get()[0];
+                    // Wrap the SQL operation in a Promise to make it async
+                    const options = await new Promise((resolve, reject) => {
+                        setTimeout(() => {
+                            try {
+                                const results = [];
+                                const stmt = db.prepare(
+                                    `WITH lib_limited AS (SELECT DISTINCT substr(lib,1,3) sublib FROM (${dataGoodSQL})),
+                                    lib_cte AS (SELECT DISTINCT lib FROM sref where lib NOT LIKE '%SREF' 
+                                    and substr(lib, 1,3) in (select sublib from lib_limited))
+                                    select * from (SELECT  sublib || ' objects, undo checkout' AS a FROM lib_limited where 0=1
+                                    UNION ALL    
+                                    SELECT lib || ' destination for change' AS a FROM lib_cte s
+                                    UNION ALL
+                                    SELECT lib || ' destination for delete' AS a FROM lib_cte s 
+                                    ) as result order by a`);
+                                
+                                while (stmt.step()) {
+                                    results.push(stmt.get()[0]);
+                                }
+                                stmt.free();
+                                resolve(results);
+                            } catch (error) {
+                                reject(error);
+                            }
+                        }, 0); // Execute in next tick
+                    });
+                    
+                    // Build the menu items
+                    options.forEach(lib => {
                         const optionDiv = document.createElement('div');
-                        optionDiv.textContent = `${lib}`;
+                        optionDiv.textContent = lib;
                         optionDiv.addEventListener('click', () => handleLibraryFilter(lib));
                         dynamicOptions.appendChild(optionDiv);
-                    }
-                    stmt.free();
+                    });
+                    
                 } catch (error) {
                     console.error('Error getting dynamic options:', error);
+                    Swal.fire({
+                        text: 'Error loading options',
+                        icon: 'error',
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                } finally {
+                    hideSpinner();
                 }
-                hideSpinner();
             }
 
             contextMenu.style.display = 'block';
@@ -1082,12 +1132,14 @@ SELECT lib || ' destination for delete' AS a FROM lib_cte s
         });
 
         // Update the handler function for processing the RIGHTCLICK menu
-        function handleLibraryFilter(lib) {
+        async function handleLibraryFilter(lib) {
             hideContextMenu();
             
             if (lib.includes('destination for') || lib.includes('undo checkout')) {
                 try {
                     showSpinner();
+                    // Add a small delay to ensure spinner is shown
+                    await new Promise(resolve => setTimeout(resolve, 50));
 
                     // Extract the raw environment or prefix (characters up to first blank)
                     const rawEnv = lib.split(' ')[0];
@@ -1119,23 +1171,33 @@ SELECT lib || ' destination for delete' AS a FROM lib_cte s
                     }
                     
                     // Get all objects from current query, filtered by library prefix
-                    const stmt = db.prepare(`
-                        SELECT DISTINCT mbr, typ 
-                        FROM (${dataGoodSQL}) 
-                        WHERE substr(lib, 1, 3) = ? 
-                        ORDER BY 1,2
-                    `);
-                    stmt.bind([libPrefix]);
-                    const commands = [];
-                    
-                    while (stmt.step()) {
-                        const row = stmt.get();
-                        const command = commandTemplate(row[0], row[1]);
-                        commands.push(command);
-                    }
-                    stmt.free();
+                    const commands = await new Promise((resolve, reject) => {
+                        setTimeout(() => {
+                            try {
+                                const results = [];
+                                const stmt = db.prepare(`
+                                    SELECT DISTINCT mbr, typ 
+                                    FROM (${dataGoodSQL}) 
+                                    WHERE substr(lib, 1, 3) = ? 
+                                    ORDER BY 1,2
+                                `);
+                                stmt.bind([libPrefix]);
+                                
+                                while (stmt.step()) {
+                                    const row = stmt.get();
+                                    const command = commandTemplate(row[0], row[1]);
+                                    results.push(command);
+                                }
+                                stmt.free();
+                                resolve(results);
+                            } catch (error) {
+                                reject(error);
+                            }
+                        }, 0);
+                    });
 
                     hideSpinner();
+                    
                     // Show confirmation dialog with commands
                     Swal.fire({
                         title: `${actionTitle} Commands`,
@@ -1153,6 +1215,7 @@ ${commands.join('\n')}
                         if (result.isConfirmed) {
                             showSpinner();
                             navigator.clipboard.writeText(commands.join('\n')).then(() => {
+                                hideSpinner();
                                 Swal.fire({
                                     text: 'Commands copied to clipboard',
                                     icon: 'success',
@@ -1160,11 +1223,11 @@ ${commands.join('\n')}
                                     timer: 1500
                                 });
                             });
-                            hideSpinner();
                         }
                     });
                 } catch (error) {
                     console.error('Error generating commands:', error);
+                    hideSpinner();
                     Swal.fire({
                         text: 'Error generating commands',
                         icon: 'error',

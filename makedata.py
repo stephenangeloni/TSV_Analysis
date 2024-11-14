@@ -11,9 +11,9 @@ import lorem
 # Constants
 LIBRARIES = ['MCOD995000', 'MCOSREF', 'MCOD995001', 'OTHSREF', 'MCOD995002', 'OLYSREF']
 FILE_TYPES = ['QSRC', 'QCLSRC']
-MEMBER_COUNT = 200
+MEMBER_COUNT = 2000
 TYPES = ['RPG', 'COBOL', 'CLP']
-LINES_PER_MEMBER = 20
+LINES_PER_MEMBER = 40
 
 def generate_random_member_name():
     """Generate a random uppercase alphanumeric member name of max 10 chars"""
