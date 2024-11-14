@@ -31,21 +31,22 @@ def generate_random_date():
     random_date = start_date + timedelta(days=random_number_of_days)
     return random_date.strftime('%Y-%m-%d')
 
-# Generate member names and assign types
-members = {}
-for _ in range(MEMBER_COUNT):
-    member_name = generate_random_member_name()
-    while member_name in members:  # Ensure uniqueness
-        member_name = generate_random_member_name()
-    members[member_name] = random.choice(TYPES)
-
 # Generate data
 data = []
+used_combinations = set()  # Track used (lib, fil, typ, mbr) combinations
+
 for lib in LIBRARIES:
     for fil in FILE_TYPES:
-        for mbr, typ in members.items():
+        for _ in range(MEMBER_COUNT):
+            # Generate unique member for this lib-fil-typ combination
+            typ = random.choice(TYPES)
+            while True:
+                mbr = generate_random_member_name()
+                if (lib, fil, typ, mbr) not in used_combinations:
+                    used_combinations.add((lib, fil, typ, mbr))
+                    break
+            
             for seq in range(1, LINES_PER_MEMBER + 1):
-                # Generate a random lorem ipsum text limited to 70 chars
                 text_data = lorem.sentence()[:70]
                 
                 row = [
@@ -76,4 +77,4 @@ with open('test.txt', 'w') as f:
 
 total_lines = len(sorted_data)
 print(f"File generated successfully with {total_lines + 1} lines.")  # +1 for header
-print(f"Generated {len(members)} unique members across {len(LIBRARIES)} libraries and {len(FILE_TYPES)} file types.")
+print(f"Generated {len(used_combinations)} unique members across {len(LIBRARIES)} libraries and {len(FILE_TYPES)} file types.")

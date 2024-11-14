@@ -1051,21 +1051,15 @@ in (select mbr from issues)</textarea>
             if (dataGood) {
                 try {
                     // Make dynamic Options 
-                    const stmt = db.prepare(`WITH lib_cte AS (SELECT DISTINCT lib FROM sref)
+                    const stmt = db.prepare(`WITH lib_cte AS (SELECT DISTINCT lib FROM sref where lib NOT LIKE '%SREF')
 , lib_limited AS (SELECT DISTINCT substr(lib,1,3) sublib FROM (${dataGoodSQL}))
 select * from (SELECT  sublib || ' objects, undo checkout' AS a FROM lib_limited
 UNION ALL    
 SELECT lib || ' destination for change' AS a FROM lib_cte s
-WHERE lib NOT LIKE '%SREF' and substr(lib, 1,3) in (select sublib from lib_limited)
+WHERE substr(lib, 1,3) in (select sublib from lib_limited)
 UNION ALL
 SELECT lib || ' destination for delete' AS a FROM lib_cte s
-WHERE lib NOT LIKE '%SREF'  and substr(lib, 1,3) in (select sublib from lib_limited)   
-UNION ALL
-SELECT lib || ' to unlisted library for change' AS a FROM lib_cte s
-WHERE lib LIKE '%SREF'  and substr(lib, 1,3) in (select sublib from lib_limited)   
-UNION ALL
-SELECT lib || ' to unlisted  library for delete' AS a FROM lib_cte s
-WHERE lib LIKE '%SREF'  and substr(lib, 1,3) in (select sublib from lib_limited) 
+WHERE substr(lib, 1,3) in (select sublib from lib_limited)   
 ) as result order by a`);
                     while (stmt.step()) {
                         const lib = stmt.get()[0];
@@ -1085,13 +1079,112 @@ WHERE lib LIKE '%SREF'  and substr(lib, 1,3) in (select sublib from lib_limited)
             contextMenu.style.top = `${event.pageY}px`;
         });
 
-        // Add the handler function for processing the RIGHTCLICK menu STEPHEN
+        // Update the handler function for processing the RIGHTCLICK menu
         function handleLibraryFilter(lib) {
             hideContextMenu();
-            const currentQuery = document.getElementById('sqlQuery').value;
-            const newQuery = `SELECT * FROM (${currentQuery}) WHERE lib = '${lib}'`;
-            document.getElementById('sqlQuery').value = newQuery;
-            runQuery();
+            
+            if (lib.includes('destination for') || lib.includes('undo checkout')) {
+                try {
+                    // Extract the raw environment or prefix (characters up to first blank)
+                    const rawEnv = lib.split(' ')[0];
+                    
+                    // Get the 3-character library prefix
+                    const libPrefix = rawEnv.substring(0, 3);
+                    
+                    // Format the environment string only for destination cases
+                    const formattedEnv = lib.includes('destination for') && rawEnv.length >= 10 ? 
+                        `${rawEnv.substring(0, 3)} ${rawEnv.charAt(3)} '${
+                            rawEnv.substring(4, 6)}.${
+                            rawEnv.substring(6, 8)}.${
+                            rawEnv.substring(8, 10)}'` : rawEnv;
+                    
+                    // Determine the command template based on the action type
+                    let commandTemplate;
+                    let actionTitle;
+                    
+                    if (lib.includes('undo checkout')) {
+                        commandTemplate = (mbr, typ) => `CL: ARMVOBJARC OBJ(${mbr}) TYPE(${typ});`;
+                        actionTitle = 'Undo Checkout';
+                    } else {
+                        const action = lib.endsWith('change') ? '*CHKOUT' : lib.endsWith('delete') ? '*DELETE' : null;
+                        if (!action) {
+                            throw new Error('Invalid action type');
+                        }
+                        commandTemplate = (mbr, typ) => `CL: ACHKOBJOUT OBJ(${mbr}) TYPE(${typ}) TOPGMR(*ME) ACTION(${action}) TOENV(${formattedEnv});`;
+                        actionTitle = action === '*CHKOUT' ? 'Checkout' : 'Delete';
+                    }
+                    
+                    // Get all objects from current query, filtered by library prefix
+                    const stmt = db.prepare(`
+                        SELECT DISTINCT mbr, typ 
+                        FROM (${dataGoodSQL}) 
+                        WHERE substr(lib, 1, 3) = ? 
+                        ORDER BY 1,2
+                    `);
+                    stmt.bind([libPrefix]);
+                    const commands = [];
+                    
+                    while (stmt.step()) {
+                        const row = stmt.get();
+                        const command = commandTemplate(row[0], row[1]);
+                        commands.push(command);
+                    }
+                    stmt.free();
+
+                    // Show confirmation dialog with commands
+                    Swal.fire({
+                        title: `${actionTitle} Commands`,
+                        html: `<div style="text-align: left; max-height: 400px; overflow-y: auto; font-family: monospace; white-space: pre;">
+${commands.join('\n')}
+                        </div>`,
+                        icon: 'info',
+                        width: '800px',
+                        showCancelButton: true,
+                        confirmButtonText: 'Copy to Clipboard',
+                        cancelButtonText: 'Cancel',
+                        confirmButtonColor: '#EC0016',
+                        cancelButtonColor: '#6e7881'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            navigator.clipboard.writeText(commands.join('\n')).then(() => {
+                                Swal.fire({
+                                    text: 'Commands copied to clipboard',
+                                    icon: 'success',
+                                    showConfirmButton: false,
+                                    timer: 1500
+                                });
+                            });
+                        }
+                    });
+                } catch (error) {
+                    console.error('Error generating commands:', error);
+                    Swal.fire({
+                        text: 'Error generating commands',
+                        icon: 'error',
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                }
+            } else {
+                // Original behavior for other cases
+                Swal.fire({
+                    title: 'Library Filter',
+                    text: `Filter by: ${lib}`,
+                    icon: 'info',
+                    showCancelButton: true,
+                    confirmButtonText: 'Apply Filter',
+                    cancelButtonText: 'Cancel',
+                    confirmButtonColor: '#EC0016',
+                    cancelButtonColor: '#6e7881'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        const currentQuery = document.getElementById('sqlQuery').value;
+                        const newQuery = `SELECT * FROM (${currentQuery}) WHERE lib = '${lib}'`;
+                        document.getElementById('sqlQuery').value = newQuery;
+                        runQuery();
+                    }
+                });
+            }
         }
 
         // Add functionality to the "Copy Definition" menu item

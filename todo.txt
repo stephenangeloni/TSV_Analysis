@@ -1,39 +1,3 @@
-WITH lib_cte AS (
-    SELECT DISTINCT lib
-    FROM sref
-)
-, lib_limited AS (
-    SELECT DISTINCT substr(lib,1,3) sublib FROM (${dataGoodSQL})
-)
-select * from (
-SELECT  sublib || ' objects, undo checkout' AS a
-FROM lib_limited
-
-UNION ALL    
-
-SELECT lib || ' destination for change' AS a
-FROM lib_cte s
-WHERE lib NOT LIKE '%SREF' and substr(lib, 1,3) in (select sublib from lib_limited)
-
-UNION ALL
-
-SELECT lib || ' destination for delete' AS a
-FROM lib_cte s
-WHERE lib NOT LIKE '%SREF'  and substr(lib, 1,3) in (select sublib from lib_limited)   
-
-UNION ALL
-
-SELECT lib || ' to unlisted library for change' AS a
-FROM lib_cte s
-WHERE lib LIKE '%SREF'  and substr(lib, 1,3) in (select sublib from lib_limited)   
-
-UNION ALL
-
-SELECT lib || ' to unlisted  library for delete' AS a
-FROM lib_cte s
-WHERE lib LIKE '%SREF'  and substr(lib, 1,3) in (select sublib from lib_limited) 
-) as result order by a
-
 
 1. Create a web page for analyzing TSV (Tab-Separated Values) files.
 2. The page should have the following elements:
