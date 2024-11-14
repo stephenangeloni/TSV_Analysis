@@ -9,7 +9,7 @@ from datetime import datetime, timedelta
 import lorem
 
 # Constants
-LIBRARIES = ['MCO', 'OTH', 'OLY', 'DEV']
+LIBRARIES = ['MCOD995000', 'MCOSREF', 'MCOD995001', 'OTHSREF', 'MCOD995002', 'OLYSREF']
 FILE_TYPES = ['QSRC', 'QCLSRC']
 MEMBER_COUNT = 200
 TYPES = ['RPG', 'COBOL', 'CLP']
