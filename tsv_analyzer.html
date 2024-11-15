@@ -1172,7 +1172,7 @@ in (select mbr from issues)</textarea>
                         if (!action) {
                             throw new Error('Invalid action type');
                         }
-                        commandTemplate = (mbr, typ) => `CL: ACHKOBJOUT OBJ(${mbr}) TYPE(*ONLY) TOPGMR(*ME) ACTION(${action}) TOENV(${formattedEnv});`;
+                        commandTemplate = (mbr, typ) => `CL: ACHKOBJOUT OBJ(${mbr}) TYPE(${typ}) TOPGMR(*ME) ACTION(${action}) TOENV(${formattedEnv});`;
                         actionTitle = action === '*CHKOUT' ? 'Checkout' : 'Delete';
                     }
                     
