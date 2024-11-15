@@ -808,6 +808,57 @@ in (select mbr from issues)</textarea>
             const modalContent = document.getElementById('modalContent');
             const modal = document.getElementById('myModal');
 
+            // Add click handler to modalHeader
+            modalHeader.style.cursor = 'pointer';  // Make it look clickable
+            modalHeader.onclick = async function() {
+                const typ = modalHeaderColumns[3];  // Get the TYP value
+                const dataContent = document.getElementById('dataContent');
+                const issuesContent = document.getElementById('issuesContent');
+                
+                // Get the source code (remove HTML markup)
+                const sourceCode = dataContent.innerText;
+                
+                // Get the issues in markdown format
+                const issuesMarkdown = await getIssuesMarkdown(modalHeaderColumns[2]); // Pass MBR
+
+                const promptTemplate = `I have a AS400 source code for an object of type ${typ} and a list of changes that are being implemented in our backend system. We're migrating from version F to version A.
+
+The ${typ} source code is:
+\`\`\`${typ}
+${sourceCode}
+\`\`\`
+
+The list of backend changes includes:
+\`\`\`
+${issuesMarkdown}
+\`\`\`
+
+Please:
+1. Analyze this and identify sections that might need modifications based on the backend changes, particularly focusing on record lengths and field modifications
+2. Explain the main purpose of this source code
+3. Assess if this functionality could be implemented using SQL instead in part or in whole if this is a program
+
+Please highlight any potentially impacted sections of code and explain why they might need changes due to the version F to version A migration.`;
+
+                // Copy to clipboard
+                navigator.clipboard.writeText(promptTemplate).then(() => {
+                    Swal.fire({
+                        text: 'Prompt copied to clipboard',
+                        icon: 'success',
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                }).catch(err => {
+                    console.error('Failed to copy prompt: ', err);
+                    Swal.fire({
+                        text: 'Failed to copy prompt',
+                        icon: 'error',
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                });
+            };
+
             modalHeader.textContent = modalHeaderColumns.join(' | ');
 
             const dataContent = document.createElement('div');
@@ -1349,6 +1400,50 @@ ${commands.join('\n')}
                 hideContextMenu();
             }
         });
+
+        // Add this new function to get issues in markdown format
+        async function getIssuesMarkdown(mbr) {
+            const query = `
+                SELECT ISSUE, RELOBJ, RELTYPE
+                FROM issues
+                WHERE MBR = ? order by RELTYPE, RELOBJ, ISSUE
+            `;
+
+            try {
+                const stmt = db.prepare(query);
+                stmt.bind([mbr]);
+                const results = [];
+                
+                while (stmt.step()) {
+                    results.push(stmt.get());
+                }
+                stmt.free();
+
+                if (results.length === 0) {
+                    return 'No related issues found.';
+                }
+
+                // Convert to markdown table format
+                let markdown = '| Issue | Related Object | Related Type |\n';
+                markdown += '|--------|----------------|---------------|\n';
+                
+                results.forEach(row => {
+                    // Clean and escape the values
+                    const cleanRow = row.map(value => 
+                        value.replace(/[\x00-\x1F\x7F]/g, '')  // Remove control characters
+                             .replace(/\|/g, '\\|')            // Escape pipe characters
+                             .trim()
+                    );
+                    markdown += `| ${cleanRow[0]} | ${cleanRow[1]} | ${cleanRow[2]} |\n`;
+                });
+
+                return markdown;
+
+            } catch (error) {
+                console.error('Error generating markdown:', error);
+                return 'Error generating issues list.';
+            }
+        }
 
     </script>
 </body>
