@@ -1108,7 +1108,13 @@ in (select mbr from issues)</textarea>
                     // Build the menu items
                     options.forEach(lib => {
                         const optionDiv = document.createElement('div');
-                        optionDiv.textContent = lib;
+                        if (lib.includes('delete')) {
+                            // Use a template literal to wrap 'delete' in a span with red color
+                            const text = lib.replace(/delete/i, '<span style="color: #EC0016">delete</span>');
+                            optionDiv.innerHTML = text;
+                        } else {
+                            optionDiv.textContent = lib;
+                        }
                         optionDiv.addEventListener('click', () => handleLibraryFilter(lib));
                         dynamicOptions.appendChild(optionDiv);
                     });
