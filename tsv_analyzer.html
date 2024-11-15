@@ -1089,9 +1089,9 @@ in (select mbr from issues)</textarea>
                                     and substr(lib, 1,3) in (select sublib from lib_limited))
                                     select * from (SELECT  sublib || ' objects, undo checkout' AS a FROM lib_limited where 0=1
                                     UNION ALL    
-                                    SELECT lib || ' destination for change' AS a FROM lib_cte s
+                                    SELECT lib || ' destination for change' AS a FROM lib_cte s where lib not like '___D994%'
                                     UNION ALL
-                                    SELECT lib || ' destination for delete' AS a FROM lib_cte s 
+                                    SELECT lib || ' destination for delete' AS a FROM lib_cte s where lib like '___D994%'
                                     ) as result order by a`);
                                 
                                 while (stmt.step()) {
