@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Compression with Pako</title>
+    <script src="https://cdn.jsdelivr.net/npm/pako@2.1.0/dist/pako.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 0 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        textarea {
+            width: 100%;
+            height: 200px;
+            margin: 10px 0;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: monospace;
+            resize: vertical;
+        }
+        .buttons {
+            display: flex;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        button {
+            padding: 10px 20px;
+            cursor: pointer;
+            border: none;
+            border-radius: 4px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        .encode {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .decode {
+            background-color: #2196F3;
+            color: white;
+        }
+        .clear {
+            background-color: #f44336;
+            color: white;
+        }
+        button:hover {
+            opacity: 0.9;
+        }
+        .status {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .success {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+            border: 1px solid #a5d6a7;
+        }
+        .error {
+            background-color: #ffebee;
+            color: #c62828;
+            border: 1px solid #ffcdd2;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Text Encoder/Decoder</h1>
+        
+        <textarea id="inputText" placeholder="Paste your text here..."></textarea>
+        
+        <div class="buttons">
+            <button class="encode" onclick="encode()">Encode</button>
+            <button class="decode" onclick="decode()">Decode</button>
+            <button class="clear" onclick="clearText()">Clear</button>
+        </div>
+
+        <div id="status" style="display: none;" class="status"></div>
+    </div>
+
+    <script>
+        function showStatus(message, isError = false) {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.style.display = 'block';
+            status.className = 'status ' + (isError ? 'error' : 'success');
+            setTimeout(() => {
+                status.style.display = 'none';
+            }, 3000);
+        }
+
+        function encode() {
+            const input = document.getElementById('inputText').value;
+            if (!input) {
+                showStatus('Please enter some text to encode', true);
+                return;
+            }
+
+            try {
+                // Convert string to Uint8Array
+                const inputBytes = new TextEncoder().encode(input);
+                
+                // Compress the bytes
+                const compressed = pako.deflate(inputBytes);
+                
+                // Convert to Base64
+                const base64 = btoa(String.fromCharCode.apply(null, compressed));
+                
+                document.getElementById('inputText').value = base64;
+                showStatus('Text encoded successfully');
+            } catch (error) {
+                showStatus('Encoding error: ' + error.message, true);
+            }
+        }
+
+        function decode() {
+            const input = document.getElementById('inputText').value;
+            if (!input) {
+                showStatus('Please enter some encoded text to decode', true);
+                return;
+            }
+
+            try {
+                // Convert Base64 back to bytes
+                const bytes = new Uint8Array(atob(input).split('').map(x => x.charCodeAt(0)));
+                
+                // Decompress
+                const decompressed = pako.inflate(bytes);
+                
+                // Convert back to string
+                const result = new TextDecoder().decode(decompressed);
+                
+                document.getElementById('inputText').value = result;
+                showStatus('Text decoded successfully');
+            } catch (error) {
+                showStatus('Decoding error: ' + error.message, true);
+            }
+        }
+
+        function clearText() {
+            document.getElementById('inputText').value = '';
+            showStatus('Text cleared');
+        }
+    </script>
+</body>
+</html>
