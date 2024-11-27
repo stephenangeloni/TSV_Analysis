@@ -810,14 +810,23 @@ in (select mbr from issues)</textarea>
 
             // Add click handler to modalHeader
             modalHeader.style.cursor = 'pointer';  // Make it look clickable
-            modalHeader.onclick = async function() {
+            modalHeader.onclick = async function(event) {
                 const typ = modalHeaderColumns[3];  // Get the TYP value
                 const dataContent = document.getElementById('dataContent');
                 const issuesContent = document.getElementById('issuesContent');
                 
-                // Get the source code (remove HTML markup)
-                const sourceCode = dataContent.innerText;
+                // Get the source code
+                let sourceCode = dataContent.innerText;
                 
+                // If it's a left click, modify the source code to only include content after second tab
+                if (event.button === 0) {  // Left click
+                    promptTemplate = sourceCode.split('\n')
+                        .map(line => {
+                            const parts = line.split('\t');
+                            return parts.length > 2 ? parts.slice(2).join('\t') : line;
+                        })
+                        .join('\n');
+                } else {             
                 // Get the issues in markdown format
                 const issuesMarkdown = await getIssuesMarkdown(modalHeaderColumns[2]); // Pass MBR
 
@@ -839,6 +848,8 @@ Please:
 3. Assess if this functionality could be implemented using SQL instead in part or in whole if this is a program
 
 Please highlight any potentially impacted sections of code and explain why they might need changes due to the version F to version A migration.`;
+
+}
 
                 // Copy to clipboard
                 navigator.clipboard.writeText(promptTemplate).then(() => {
