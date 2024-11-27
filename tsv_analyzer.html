@@ -61,11 +61,18 @@
         .header {
             background-color: var(--header-background);
             color: var(--text-color);
-            padding: 20px;
+            padding: 20px 20px ;
             display: flex;
             align-items: center;
             justify-content: space-between;
             position: relative;
+        }
+
+        .file-inputs {
+            display: flex;
+            align-items: center;
+            margin-left: auto;
+            margin-right: 0;
         }
 
         .logo-container {
@@ -246,6 +253,8 @@
             display: inline-block;
             width: 60px;
             height: 34px;
+            margin-left: 20px;
+            margin-right: auto;
         }
 
         .switch input {
@@ -316,7 +325,8 @@
         .file-inputs {
             display: flex;
             align-items: center;
-            margin-right: auto;
+            margin-left: auto;
+            margin-right: 0;
         }
 
         .logo {
@@ -407,19 +417,19 @@
 <body>
     <div class="container">
         <div class="header">
-            <div class="file-inputs">
-                <label for="loadSREF" class="button">Load Ref Analysis</label>
-                <input type="file" id="loadSREF" accept=".tsv,.txt">
-            </div>
+            <label class="switch">
+                <input type="checkbox" id="darkModeToggle">
+                <span class="slider"></span>
+            </label>
 
             <div class="logo-container">
                 <div class="logo">Analyzer</div>
             </div>
 
-            <label class="switch">
-                <input type="checkbox" id="darkModeToggle">
-                <span class="slider"></span>
-            </label>
+            <div class="file-inputs">
+                <label for="loadSREF" class="button">Load Ref Analysis</label>
+                <input type="file" id="loadSREF" accept=".tsv,.txt">
+            </div>
         </div>
         <div class="content">
             <div id="filteredRowsCount"></div>
@@ -818,19 +828,19 @@ in (select mbr from issues)</textarea>
                 // Get the source code
                 let sourceCode = dataContent.innerText;
                 
-                // If it's a left click, modify the source code to only include content after second tab
-                if (event.button === 0) {  // Left click
+                // If it's a regular click without modifiers, modify the source code to only include content after second tab
+                if (!event.ctrlKey && !event.shiftKey && !event.altKey) {  // Regular click
                     promptTemplate = sourceCode.split('\n')
                         .map(line => {
                             const parts = line.split('\t');
                             return parts.length > 2 ? parts.slice(2).join('\t') : line;
                         })
                         .join('\n');
-                } else {             
-                // Get the issues in markdown format
-                const issuesMarkdown = await getIssuesMarkdown(modalHeaderColumns[2]); // Pass MBR
+                } else {  // Click with any modifier key (Ctrl, Shift, or Alt)             
+                    // Get the issues in markdown format
+                    const issuesMarkdown = await getIssuesMarkdown(modalHeaderColumns[2]); // Pass MBR
 
-                const promptTemplate = `I have a AS400 source code for an object of type ${typ} and a list of changes that are being implemented in our backend system. We're migrating from version F to version A.
+                    const promptTemplate = `I have a AS400 source code for an object of type ${typ} and a list of changes that are being implemented in our backend system. We're migrating from version F to version A.
 
 The ${typ} source code is:
 \`\`\`${typ}
@@ -847,8 +857,7 @@ Please:
 2. Explain the main purpose of this source code
 
 Please highlight any potentially impacted sections of code and explain why they might need changes due to the issues listed.`;
-
-}
+                }
 
                 // Copy to clipboard
                 navigator.clipboard.writeText(promptTemplate).then(() => {
